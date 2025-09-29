@@ -42,8 +42,8 @@ export default function SignInPage() {
       });
       setResponse(responses.message);
       console.log(responses);
-      // localStorage.setItem("xy9a7b", response.data.jwt);
-
+      localStorage.setItem("xy9a7b", responses.jwt);
+      
       // Navigate based on role from backend
       switch (responses.role) {
         case "REGISTRAR":
@@ -56,11 +56,11 @@ export default function SignInPage() {
           navigate("/dean");
           break;
         default:
-          console.log("Role not handled:", response.role);
+          console.log("Role not handled:", responses.role);
       }
     } catch (err) {
-      setError(err?.response?.data?.error || "failed to login");
-      console.log(err.response.data.error);
+      setError(err?.responses?.data?.error || "failed to login");
+      console.log(err.responses.data.error);
       console.error("Error:", err);
     }
   };

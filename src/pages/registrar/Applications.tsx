@@ -7,209 +7,93 @@ import {
 } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { Table, Button, Input } from "antd";
-import useApi from "../../hooks/useApi";
-import endPoints from "../../components/api/endPoints";
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import apiService from "@/components/api/apiService";
+import endPoints from "@/components/api/endPoints";
 // import EditableTableApplicant, {
 //   DataTypes,
 // } from "@/components/Extra/EditableTableApplicant";
 import EditableTable, { DataTypes } from "@/components/Extra/EditableTable";
 import { init } from "node_modules/i18next";
-const something = [
-  {
-    key: "1",
-    name: "Surafel",
-    amharicName: "ሱራፌል",
-    department: "Medicine",
-
-    year: 23,
-    gender: "M",
-    photo: "https://i.pravatar.cc/150?img=1",
-  },
-];
-const initialData: DataTypes[] = [
-  {
-    key: "1",
-    name: "Surafel",
-    amharicName: "ሱራፌል",
-    department: "Medicine",
-
-    year: 4,
-    gender: "M",
-    photo: "https://i.pravatar.cc/150?img=1",
-  },
-  {
-    key: "2",
-    name: "Mekdes",
-    amharicName: "መቅደስ",
-    year: 2,
-    department: "Medicine",
-
-    gender: "F",
-    photo: "https://i.pravatar.cc/150?img=2",
-  },
-  {
-    key: "3",
-    name: "Nahom",
-    amharicName: "ናሆም",
-    year: 5,
-    department: "Medicine",
-
-    gender: "M",
-    photo: "https://i.pravatar.cc/150?img=3",
-  },
-  {
-    key: "4",
-    name: "Selam",
-    amharicName: "ሰላም",
-    department: "Medicine",
-
-    year: 5,
-    gender: "F",
-    photo: "https://i.pravatar.cc/150?img=4",
-  },
-  {
-    key: "5",
-    name: "Bereket",
-    amharicName: "በረከት",
-    department: "Medicine",
-
-    year: 1,
-    gender: "M",
-    photo: "https://i.pravatar.cc/150?img=5",
-  },
-  {
-    key: "6",
-    name: "Hana",
-    amharicName: "ሐና",
-    department: "Medicine",
-
-    year: 2,
-    gender: "F",
-    photo: "https://i.pravatar.cc/150?img=6",
-  },
-  {
-    key: "7",
-    name: "Samuel",
-    amharicName: "ሳሙኤል",
-    department: "Medicine",
-
-    year: 2,
-    gender: "M",
-    photo: "https://i.pravatar.cc/150?img=7",
-  },
-  {
-    key: "8",
-    name: "Mahi",
-    amharicName: "ማሂ",
-    department: "Medicine",
-
-    year: 3,
-    gender: "F",
-    photo: "https://i.pravatar.cc/150?img=8",
-  },
-  {
-    key: "9",
-    name: "Bethel",
-    amharicName: "ቤተል",
-    department: "Medicine",
-
-    year: 1,
-    gender: "M",
-    photo: "https://i.pravatar.cc/150?img=9",
-  },
-  {
-    key: "10",
-    name: "Yonatan",
-    amharicName: "ዮናታን",
-    department: "Medicine",
-
-    year: 4,
-    gender: "M",
-    photo: "https://i.pravatar.cc/150?img=10",
-  },
-  {
-    key: "11",
-    name: "Marta",
-    amharicName: "ማርታ",
-    department: "Medicine",
-
-    year: 1,
-    gender: "F",
-    photo: "https://i.pravatar.cc/150?img=11",
-  },
-  {
-    key: "12",
-    name: "Eyob",
-    amharicName: "ኢዮብ",
-    department: "Medicine",
-
-    year: 5,
-    gender: "M",
-    photo: "https://i.pravatar.cc/150?img=12",
-  },
-  {
-    key: "13",
-    name: "Mikiyas",
-    amharicName: "ሚኪያስ",
-    department: "Medicine",
-
-    year: 3,
-    gender: "M",
-    photo: "https://i.pravatar.cc/150?img=13",
-  },
-  {
-    key: "14",
-    name: "Rahel",
-    amharicName: "ራሔል",
-    department: "Medicine",
-
-    year: 2,
-    gender: "F",
-    photo: "https://i.pravatar.cc/150?img=14",
-  },
-  {
-    key: "15",
-    name: "Dawit",
-    amharicName: "ዳዊት",
-    year: 4,
-    department: "Medicine",
-
-    gender: "M",
-    photo: "https://i.pravatar.cc/150?img=15",
-  },
-  {
-    key: "16",
-    name: "Ruth",
-    amharicName: "ሩት",
-    year: 2,
-    department: "Medicine",
-
-    gender: "F",
-    photo: "https://i.pravatar.cc/150?img=16",
-  },
-  {
-    key: "17",
-    name: "Kidus",
-    amharicName: "ቅዱስ",
-    department: "Medicine",
-    year: 2,
-    gender: "M",
-    photo: "https://i.pravatar.cc/150?img=17",
-  },
-];
+type ApplicantRow = DataTypes;
 export default function RegistrarApplications() {
   const [searchText, setSearchText] = useState("");
   const [filteredDepartment, setFilteredDepartment] = useState("");
-  const filteredData = initialData.filter((item) => {
-    const matchedDeparment = filteredDepartment
-      ? item.department == filteredDepartment
-      : true;
+  const [rows, setRows] = useState<ApplicantRow[]>([]);
+  const objectUrlRefs = useRef<string[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      try {
+        const applicants = await apiService.get(endPoints.applicantsList);
+        const mapped: ApplicantRow[] = (applicants || []).map((a: any) => {
+          const englishName = [a.firstNameENG, a.fatherNameENG, a.grandfatherNameENG]
+            .filter(Boolean)
+            .join(" ");
+          const amharicName = [a.firstNameAMH, a.fatherNameAMH, a.grandfatherNameAMH]
+            .filter(Boolean)
+            .join(" ");
+          return {
+            key: String(a.id),
+            id: String(a.id),
+            name: englishName || "-",
+            amharicName: amharicName || "-",
+            year: Number(a.classYearId) || 0,
+            batch: String(a.classYearId || "-"),
+            status: a.applicationStatus || "Pending",
+            department: String(a.departmentEnrolledId || "-"),
+            photo: undefined,
+          } as ApplicantRow;
+        });
+
+        // Try to fetch photos per applicant
+        const withPhotos = await Promise.all(
+          mapped.map(async (s) => {
+            try {
+              const blob = await apiService.get(
+                endPoints.applicantPhoto.replace(":id", s.id),
+                {},
+                { responseType: "blob", headers: { requiresAuth: true } }
+              );
+              if (blob && blob.size > 0) {
+                const url = URL.createObjectURL(blob);
+                objectUrlRefs.current.push(url);
+                return { ...s, photo: url } as ApplicantRow;
+              }
+              return s;
+            } catch (_) {
+              return s;
+            }
+          })
+        );
+
+        if (!cancelled) setRows(withPhotos);
+      } catch (_) {
+        if (!cancelled) setRows([]);
+      }
+    }
+    load();
+    return () => {
+      cancelled = true;
+      objectUrlRefs.current.forEach((u) => URL.revokeObjectURL(u));
+      objectUrlRefs.current = [];
+    };
+  }, []);
+
+  const filteredData = useMemo(() => {
     const search = searchText.toLowerCase();
-    return (
-      item.name?.toString().toLowerCase().includes(search) && matchedDeparment
-    );
-  });
+    return rows.filter((item) => {
+    const matchedDeparment = filteredDepartment
+        ? String(item.department) === filteredDepartment
+      : true;
+      const searchable = [item.name, item.amharicName, item.id, item.department]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      return searchable.includes(search) && matchedDeparment;
+    });
+  }, [rows, searchText, filteredDepartment]);
 
   return (
     <div className="min-h-screen space-y-4 sm:space-y-6">

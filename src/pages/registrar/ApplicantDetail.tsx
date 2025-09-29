@@ -21,6 +21,7 @@ import {
   GraduationCap,
   Edit,
   Camera,
+  Download,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
@@ -41,6 +42,8 @@ export default function ApplicantDetail() {
   const [passwordError, setPasswordError] = useState(""); // Stores password error message
   const [applicantData, setApplicant] = useState();
   const [loading, setIsLoading] = useState(true);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [documentUrl, setDocumentUrl] = useState<string | null>(null);
   const { id } = useParams();
   console.log(id);
   // const applicantData = {
@@ -98,6 +101,51 @@ export default function ApplicantDetail() {
       }
     }
     getter();
+  }, [id]);
+  // Load applicant photo and document as blobs
+  useEffect(() => {
+    let revokedPhotoUrl: string | null = null;
+    let revokedDocumentUrl: string | null = null;
+    async function loadBlobs() {
+      if (!id) return;
+      try {
+        // Photo
+        const photoBlob: Blob = await apiService.get(
+          endPoints.applicantPhoto.replace(":id", id as string),
+          {},
+          { responseType: "blob", headers: { requiresAuth: true } }
+        );
+        if (photoBlob && photoBlob.size > 0 && photoBlob.type.startsWith("image")) {
+          const url = URL.createObjectURL(photoBlob);
+          setPhotoUrl(url);
+          revokedPhotoUrl = url;
+        } else {
+          setPhotoUrl(null);
+        }
+
+        // Document (PDF)
+        const docBlob: Blob = await apiService.get(
+          endPoints.applicantDocument.replace(":id", id as string),
+          {},
+          { responseType: "blob", headers: { requiresAuth: true } }
+        );
+        if (docBlob && docBlob.size > 0) {
+          const url = URL.createObjectURL(docBlob);
+          setDocumentUrl(url);
+          revokedDocumentUrl = url;
+        } else {
+          setDocumentUrl(null);
+        }
+      } catch (_) {
+        setPhotoUrl(null);
+        setDocumentUrl(null);
+      }
+    }
+    loadBlobs();
+    return () => {
+      if (revokedPhotoUrl) URL.revokeObjectURL(revokedPhotoUrl);
+      if (revokedDocumentUrl) URL.revokeObjectURL(revokedDocumentUrl);
+    };
   }, [id]);
   useEffect(() => {
     async function getter() {
@@ -158,7 +206,7 @@ export default function ApplicantDetail() {
           <CardHeader className="text-center">
             <div className="relative mx-auto">
               <Avatar className="w-32 h-32">
-                <AvatarImage src={applicantData?.studentPhoto} />
+                <AvatarImage src={photoUrl || applicantData?.studentPhoto} />
                 <AvatarFallback className="text-2xl">
                   {applicantData.firstNameENG[0]}
                   {applicantData.fatherNameENG[0]}
@@ -405,6 +453,36 @@ export default function ApplicantDetail() {
               className="w-64 h-36 object-cover rounded-lg border-2 border-gray-200 dark:border-gray-700"
             />
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Applicant Document */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Download className="mr-2 h-5 w-5" /> Applicant Document
+          </CardTitle>
+          <CardDescription>Uploaded application document (PDF)</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {documentUrl ? (
+            <div className="space-y-3">
+              <div className="w-full h-96 border rounded-lg overflow-hidden">
+                <iframe title="Applicant Document" src={documentUrl} className="w-full h-full" />
+              </div>
+              <div>
+                <a
+                  href={documentUrl}
+                  download={`applicant-${id}-document.pdf`}
+                  className="inline-flex items-center px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"
+                >
+                  <Download className="mr-2 h-4 w-4" /> Download PDF
+                </a>
+              </div>
+            </div>
+          ) : (
+            <div className="text-sm text-gray-500">No document available.</div>
+          )}
         </CardContent>
       </Card>
 
