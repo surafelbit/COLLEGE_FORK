@@ -15,16 +15,16 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
-export default function DeanLayout() {
+export default function ViceDeanLayout() {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const navigation = [
-    { name: "Dashboard", href: "/dean/dashboard", icon: LayoutDashboard },
-    { name: "Students", href: "/dean/students", icon: Users },
-    { name: "Grades", href: "/dean/grades", icon: BookOpen },
-    { name: "Reports", href: "/dean/reports", icon: BarChart3 },
-    { name: "Deparment", href: "/dean/department", icon: Layers },
+    { name: "Dashboard", href: "/vice-dean/dashboard", icon: LayoutDashboard },
+    { name: "Students", href: "/vice-dean/students", icon: Users },
+    { name: "Grades", href: "/vice-dean/grades", icon: BookOpen },
+    { name: "Reports", href: "/vice-dean/reports", icon: BarChart3 },
+    { name: "Deparment", href: "/vice-dean/department", icon: Layers },
   ];
   useEffect(() => {
     // Update when resizing
@@ -91,7 +91,7 @@ export default function DeanLayout() {
         <nav className="mt-8">
           <div className="px-4 space-y-2">
             {navigation.map((item) => {
-              const isActive = location.pathname === item.href;
+              const isActive = location.pathname.includes(item.href);
               return (
                 <Link
                   key={item.name}
