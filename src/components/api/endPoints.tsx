@@ -1,12 +1,17 @@
 const endPoints = {
   login: "/auth/login",
   register: "/auth/register",
-  applicants: "/applicants/register",
+  applicantsRegister: "/applicants/", // POST
+  applicantsList: "/applicants", // GET
+  applicantDetail: "/applicants/:id", // GET
+  applicantUpdateStatus: "/applicants/:id/status", // PUT
+  applicantPhoto: "/applicants/:id/photo", // GET
+  applicantDocument: "/applicants/:id/document", // GET
+  students: "/students", // GET
   createDepartmentHead: "/auth/create-department-head",
   createTeacher: "/auth/create-teacher",
   departmentHeads: "/department-heads",
   teachers: "/teachers",
-  applicantDetail: "/applicants/:id",
   departments: "/departments",
   impairments: "/impairments",
   semesters: "/semesters",
@@ -16,7 +21,7 @@ const endPoints = {
   semester: "/semesters",
   BatchClassYearSemesters: "/bcsy",
   batches: "/batches",
-
+  courses: "/courses/single",
   regions: "/region",
   zonesByRegion: "/zone/region",
   woredasByZone: "/woreda/zone",

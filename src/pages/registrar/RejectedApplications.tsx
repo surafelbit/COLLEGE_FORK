@@ -1,236 +1,94 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { motion } from "framer-motion";
-import { Table, Button, Input } from "antd";
-import useApi from "../../hooks/useApi";
-import endPoints from "../../components/api/endPoints";
-import { useState } from "react";
-// import EditableTableApplicant, {
-//   DataTypes,
-// } from "@/components/Extra/EditableTableApplicant";
-// import EditableTable, { DataTypes } from "@/components/Extra/EditableTable";
-import EditableTableRejected, {
-  DataTypes,
-} from "@/components/Extra/EditableTableRejected";
-import { init } from "node_modules/i18next";
-const something = [
-  {
-    key: "1",
-    name: "Surafel",
-    amharicName: "ሱራፌል",
-    department: "Medicine",
+// page container uses plain markup; remove unused card imports
+import { useEffect, useMemo, useRef, useState } from "react";
+import EditableTableRejected, { type DataTypes } from "@/components/Extra/EditableTableRejected";
+import apiService from "@/components/api/apiService";
+import endPoints from "@/components/api/endPoints";
 
-    year: 23,
-    gender: "M",
-    photo: "https://i.pravatar.cc/150?img=1",
-  },
-];
-const initialData: DataTypes[] = [
-  {
-    key: "1",
-    name: "Surafel",
-    amharicName: "ሱራፌል",
-    department: "Medicine",
+type RejectedRow = DataTypes;
 
-    age: 1,
-    registeredYear: 24,
-    gender: "M",
-    photo: "https://i.pravatar.cc/150?img=1",
-  },
-  {
-    key: "2",
-    name: "Mekdes",
-    amharicName: "መቅደስ",
-    age: 1,
-    registeredYear: 24,
-    department: "Medicine",
-
-    gender: "F",
-    photo: "https://i.pravatar.cc/150?img=2",
-  },
-  {
-    key: "3",
-    name: "Nahom",
-    amharicName: "ናሆም",
-    age: 1,
-    registeredYear: 24,
-    department: "Medicine",
-
-    gender: "M",
-    photo: "https://i.pravatar.cc/150?img=3",
-  },
-  {
-    key: "4",
-    name: "Selam",
-    amharicName: "ሰላም",
-    department: "Medicine",
-
-    age: 1,
-    registeredYear: 24,
-    gender: "F",
-    photo: "https://i.pravatar.cc/150?img=4",
-  },
-  {
-    key: "5",
-    name: "Bereket",
-    amharicName: "በረከት",
-    department: "Medicine",
-
-    age: 1,
-    registeredYear: 24,
-    gender: "M",
-    photo: "https://i.pravatar.cc/150?img=5",
-  },
-  {
-    key: "6",
-    name: "Hana",
-    amharicName: "ሐና",
-    department: "Medicine",
-
-    age: 1,
-    registeredYear: 24,
-    gender: "F",
-    photo: "https://i.pravatar.cc/150?img=6",
-  },
-  {
-    key: "7",
-    name: "Samuel",
-    amharicName: "ሳሙኤል",
-    department: "Medicine",
-
-    age: 1,
-    registeredYear: 24,
-    gender: "M",
-    photo: "https://i.pravatar.cc/150?img=7",
-  },
-  {
-    key: "8",
-    name: "Mahi",
-    amharicName: "ማሂ",
-    department: "Medicine",
-
-    age: 1,
-    registeredYear: 24,
-    gender: "F",
-    photo: "https://i.pravatar.cc/150?img=8",
-  },
-  {
-    key: "9",
-    name: "Bethel",
-    amharicName: "ቤተል",
-    department: "Medicine",
-
-    age: 1,
-    registeredYear: 24,
-    gender: "M",
-    photo: "https://i.pravatar.cc/150?img=9",
-  },
-  {
-    key: "10",
-    name: "Yonatan",
-    amharicName: "ዮናታን",
-    department: "Medicine",
-
-    age: 1,
-    registeredYear: 24,
-    gender: "M",
-    photo: "https://i.pravatar.cc/150?img=10",
-  },
-  {
-    key: "11",
-    name: "Marta",
-    amharicName: "ማርታ",
-    department: "Medicine",
-
-    age: 1,
-    registeredYear: 24,
-    gender: "F",
-    photo: "https://i.pravatar.cc/150?img=11",
-  },
-  {
-    key: "12",
-    name: "Eyob",
-    amharicName: "ኢዮብ",
-    department: "Medicine",
-
-    age: 1,
-    registeredYear: 24,
-    gender: "M",
-    photo: "https://i.pravatar.cc/150?img=12",
-  },
-  {
-    key: "13",
-    name: "Mikiyas",
-    amharicName: "ሚኪያስ",
-    department: "Medicine",
-
-    age: 1,
-    registeredYear: 24,
-    gender: "M",
-    photo: "https://i.pravatar.cc/150?img=13",
-  },
-  {
-    key: "14",
-    name: "Rahel",
-    amharicName: "ራሔል",
-    department: "Medicine",
-
-    age: 1,
-    registeredYear: 24,
-    gender: "F",
-    photo: "https://i.pravatar.cc/150?img=14",
-  },
-  {
-    key: "15",
-    name: "Dawit",
-    amharicName: "ዳዊት",
-    age: 1,
-    registeredYear: 24,
-    department: "Medicine",
-
-    gender: "M",
-    photo: "https://i.pravatar.cc/150?img=15",
-  },
-  {
-    key: "16",
-    name: "Ruth",
-    amharicName: "ሩት",
-    age: 1,
-    registeredYear: 24,
-    department: "Medicine",
-
-    gender: "F",
-
-    photo: "https://i.pravatar.cc/150?img=16",
-  },
-  {
-    key: "17",
-    name: "Kidus",
-    amharicName: "ቅዱስ",
-    department: "Medicine",
-    age: 1,
-    registeredYear: 24,
-    gender: "M",
-    photo: "https://i.pravatar.cc/150?img=17",
-  },
-];
 export default function RejectedApplications() {
   const [searchText, setSearchText] = useState("");
   const [filteredDepartment, setFilteredDepartment] = useState("");
-  const filteredData = initialData.filter((item) => {
-    const matchedDeparment = filteredDepartment
-      ? item.department == filteredDepartment
-      : true;
+  const [rows, setRows] = useState<RejectedRow[]>([]);
+  const objectUrlRefs = useRef<string[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      try {
+        setLoading(true);
+        const applicants = await apiService.get(endPoints.applicantsList);
+        const mapped: RejectedRow[] = (applicants || [])
+          .filter((a: any) => (a.applicationStatus || "").toUpperCase() === "REJECTED")
+          .map((a: any) => {
+            const englishName = [a.firstNameENG, a.fatherNameENG, a.grandfatherNameENG]
+              .filter(Boolean)
+              .join(" ");
+            const amharicName = [a.firstNameAMH, a.fatherNameAMH, a.grandfatherNameAMH]
+              .filter(Boolean)
+              .join(" ");
+            return {
+              key: String(a.id),
+              name: englishName || "-",
+              amharicName: amharicName || "-",
+              registeredYear: Number(a.classYearId) || 0,
+              department: String(a.departmentEnrolledId || "-"),
+              gender: a.gender || "",
+              age: Number(a.age) || 0,
+              status: a.applicationStatus || "REJECTED",
+              photo: undefined,
+            } as RejectedRow;
+          });
+
+        const withPhotos = await Promise.all(
+          mapped.map(async (s) => {
+            try {
+              const blob = await apiService.get(
+                endPoints.applicantPhoto.replace(":id", s.key),
+                {},
+                { responseType: "blob", headers: { requiresAuth: true } }
+              );
+              if (blob && blob.size > 0) {
+                const url = URL.createObjectURL(blob);
+                objectUrlRefs.current.push(url);
+                return { ...s, photo: url } as RejectedRow;
+              }
+              return s;
+            } catch (_) {
+              return s;
+            }
+          })
+        );
+
+        if (!cancelled) setRows(withPhotos);
+      } catch (_) {
+        if (!cancelled) setRows([]);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    load();
+    return () => {
+      cancelled = true;
+      objectUrlRefs.current.forEach((u) => URL.revokeObjectURL(u));
+      objectUrlRefs.current = [];
+    };
+  }, []);
+
+  const filteredData = useMemo(() => {
     const search = searchText.toLowerCase();
-    return (
-      item.name?.toString().toLowerCase().includes(search) && matchedDeparment
-    );
-  });
+    return rows.filter((item) => {
+      const matchedDeparment = filteredDepartment
+        ? String(item.department) === filteredDepartment
+        : true;
+      const searchable = [item.name, item.amharicName, item.department]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      return searchable.includes(search) && matchedDeparment;
+    });
+  }, [rows, searchText, filteredDepartment]);
 
   return (
     <div className="min-h-screen space-y-4 sm:space-y-6">
@@ -267,16 +125,21 @@ export default function RejectedApplications() {
                 <option value="Pharmacy">Pharmacy</option>
               </select>
             </div>
-            <div className="overflow-x-auto rounded-lg">
-              <EditableTableRejected
-                initialData={filteredData}
-                className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 transition-all duration-300"
-              />
+            <div className="overflow-x-auto rounded-lg min-h-[200px] flex items-center justify-center">
+              {loading ? (
+                <div className="flex items-center justify-center py-10">
+                  <div className="animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-t-transparent"></div>
+                </div>
+              ) : filteredData.length === 0 ? (
+                <div className="text-sm text-gray-500">No data</div>
+              ) : (
+                <EditableTableRejected initialData={filteredData} />
+              )}
             </div>
           </div>
         </div>
       </div>
-      <style jsx>{`
+      <style>{`
         .animate-fadeIn {
           animation: fadeIn 0.7s ease-in-out forwards;
         }

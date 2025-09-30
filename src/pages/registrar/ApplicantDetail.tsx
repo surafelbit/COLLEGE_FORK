@@ -6,10 +6,9 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import axios from "axios";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+// import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -21,10 +20,11 @@ import {
   GraduationCap,
   Edit,
   Camera,
+  Download,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
-import { motion } from "framer-motion";
+// import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useModal } from "@/hooks/Modal";
@@ -34,15 +34,20 @@ import LoadingSpinner from "@/designs/LoadingSpinner";
 import UserNotFound from "@/designs/UserNotFound";
 export default function ApplicantDetail() {
   const navigate = useNavigate();
-  const [status, setStatus] = useState(null); // Tracks acceptance/rejection status
+  const [status, setStatus] = useState<string | null>(null); // Tracks acceptance/rejection status
   const [remarks, setRemarks] = useState(""); // Stores remarks for acceptance/rejection
   const [password, setPassword] = useState(""); // Stores new password
   const [confirmPassword, setConfirmPassword] = useState(""); // Stores confirm password
   const [passwordError, setPasswordError] = useState(""); // Stores password error message
-  const [applicantData, setApplicant] = useState();
+  const [applicantData, setApplicant] = useState<any>();
   const [loading, setIsLoading] = useState(true);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [documentUrl, setDocumentUrl] = useState<string | null>(null);
   const { id } = useParams();
   console.log(id);
+  // Modal for acceptance extra form
+  const { openModal, closeModal } = useModal() as any;
+  const [actionBusy, setActionBusy] = useState(false);
   // const applicantData = {
   //   firstNameAMH: "አበበ",
   //   firstNameENG: "Abebe",
@@ -88,7 +93,7 @@ export default function ApplicantDetail() {
     async function getter() {
       try {
         setIsLoading(true); // Set loading to true
-        const url = endPoints.applicantDetail.replace(":id", id);
+        const url = endPoints.applicantDetail.replace(":id", id as string);
         const response = await apiService.get(url);
         setApplicant(response);
       } catch (error) {
@@ -99,14 +104,202 @@ export default function ApplicantDetail() {
     }
     getter();
   }, [id]);
+  // Load applicant photo and document as blobs
+  useEffect(() => {
+    let revokedPhotoUrl: string | null = null;
+    let revokedDocumentUrl: string | null = null;
+    async function loadBlobs() {
+      if (!id) return;
+      try {
+        // Photo
+        const photoBlob: Blob = await apiService.get(
+          endPoints.applicantPhoto.replace(":id", id as string),
+          {},
+          { responseType: "blob", headers: { requiresAuth: true } }
+        );
+        if (photoBlob && photoBlob.size > 0 && photoBlob.type.startsWith("image")) {
+          const url = URL.createObjectURL(photoBlob);
+          setPhotoUrl(url);
+          revokedPhotoUrl = url;
+        } else {
+          setPhotoUrl(null);
+        }
 
-  const handleStatusChange = (newStatus) => {
-    // if (remarks.trim() === "") {
-    //   alert("Please provide remarks before submitting.");
-    //   return;
-    // }
-    setStatus(newStatus);
-  };
+        // Document (PDF)
+        const docBlob: Blob = await apiService.get(
+          endPoints.applicantDocument.replace(":id", id as string),
+          {},
+          { responseType: "blob", headers: { requiresAuth: true } }
+        );
+        if (docBlob && docBlob.size > 0) {
+          const url = URL.createObjectURL(docBlob);
+          setDocumentUrl(url);
+          revokedDocumentUrl = url;
+        } else {
+          setDocumentUrl(null);
+        }
+      } catch (_) {
+        setPhotoUrl(null);
+        setDocumentUrl(null);
+      }
+    }
+    loadBlobs();
+    return () => {
+      if (revokedPhotoUrl) URL.revokeObjectURL(revokedPhotoUrl);
+      if (revokedDocumentUrl) URL.revokeObjectURL(revokedDocumentUrl);
+    };
+  }, [id]);
+  // Removed unused effect
+
+  async function callUpdateStatus(payload: any) {
+    if (!id) return;
+    setActionBusy(true);
+    try {
+      const url = endPoints.applicantUpdateStatus.replace(":id", id);
+      const response = await apiService.put(
+        url,
+        payload,
+        { headers: { requiresAuth: true } }
+      );
+      // Update local UI state when backend confirms
+      setStatus(payload.status === "ACCEPTED" ? "accepted" : payload.status === "REJECTED" ? "rejected" : payload.status);
+      if (response) {
+        setApplicant((prev: any) => ({ ...(prev || {}), applicationStatus: payload.status }));
+      }
+      return true;
+    } catch (e) {
+      console.error("Failed to update status", e);
+      return false;
+    } finally {
+      setActionBusy(false);
+    }
+  }
+
+  function openAcceptModal() {
+    const AcceptForm = () => {
+      const [username, setUsername] = useState("");
+      const [passwordLocal, setPasswordLocal] = useState("");
+      const [documentStatus, setDocumentStatus] = useState<"COMPLETE" | "INCOMPLETE" | "">("");
+      const [remark, setRemark] = useState("");
+      const [isTransfer, setIsTransfer] = useState(false);
+      const [grade12Result, setGrade12Result] = useState<string>("");
+      return (
+        <div className="w-[92vw] sm:w-[560px] max-w-[95vw] p-6">
+          <h2 className="text-xl font-semibold mb-4">Accept Applicant</h2>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Username</label>
+              <input
+                className="w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-900"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Enter username"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Password</label>
+              <input
+                type="password"
+                className="w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-900"
+                value={passwordLocal}
+                onChange={(e) => setPasswordLocal(e.target.value)}
+                placeholder="Enter password"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Document Status</label>
+              <select
+                className="w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-900"
+                value={documentStatus}
+                onChange={(e) => setDocumentStatus(e.target.value as any)}
+              >
+                <option value="">Select status</option>
+                <option value="COMPLETE">COMPLETE</option>
+                <option value="INCOMPLETE">INCOMPLETE</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Remark (optional)</label>
+              <textarea
+                className="w-full px-3 py-2 border rounded-md h-24 bg-white dark:bg-gray-900"
+                value={remark}
+                onChange={(e) => setRemark(e.target.value)}
+                placeholder="Write any notes..."
+              />
+            </div>
+            <div className="flex items-center space-x-2">
+              <input
+                id="acceptIsTransfer"
+                type="checkbox"
+                className="h-4 w-4"
+                checked={isTransfer}
+                onChange={(e) => setIsTransfer(e.target.checked)}
+              />
+              <label htmlFor="acceptIsTransfer" className="text-sm">Is Transfer</label>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Grade 12 Result (optional)</label>
+              <input
+                type="number"
+                min={0}
+                max={700}
+                className="w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-900"
+                value={grade12Result}
+                onChange={(e) => setGrade12Result(e.target.value)}
+                placeholder="0 - 700"
+              />
+            </div>
+          </div>
+          <div className="mt-6 flex justify-end space-x-3">
+            <button
+              className="px-4 py-2 rounded-md border"
+              onClick={closeModal}
+              disabled={actionBusy}
+            >
+              Cancel
+            </button>
+            <button
+              className="px-4 py-2 rounded-md bg-blue-600 text-white disabled:opacity-60"
+              onClick={async () => {
+                if (!username.trim()) { alert("Username is required"); return; }
+                if (!passwordLocal.trim()) { alert("Password is required"); return; }
+                if (!documentStatus) { alert("Please select document status"); return; }
+                const g12 = grade12Result ? Number(grade12Result) : undefined;
+                if (g12 !== undefined && (isNaN(g12) || g12 < 0 || g12 > 700)) {
+                  alert("Grade 12 result must be a number between 0 and 700");
+                  return;
+                }
+                const ok = await callUpdateStatus({
+                  status: "ACCEPTED",
+                  username,
+                  password: passwordLocal,
+                  documentStatus,
+                  remark: remark || undefined,
+                  isTransfer,
+                  grade12Result: g12,
+                });
+                if (ok) closeModal();
+              }}
+              disabled={actionBusy}
+            >
+              Confirm
+            </button>
+          </div>
+        </div>
+      );
+    };
+    openModal(<AcceptForm />);
+  }
+
+  async function handleRejectClick() {
+    // Optional: prompt for remark if empty
+    const payload: any = { status: "REJECTED" };
+    if (remarks && remarks.trim()) payload.remark = remarks.trim();
+    const ok = await callUpdateStatus(payload);
+    if (ok) {
+      // nothing else to do; UI already reflects
+    }
+  }
 
   const handlePasswordSubmit = () => {
     if (password !== confirmPassword) {
@@ -125,7 +318,7 @@ export default function ApplicantDetail() {
     return <LoadingSpinner />;
   }
   if (!applicantData) {
-    return <UserNotFound />;
+    return <UserNotFound username="Applicant" />;
   }
   return (
     <div className="space-y-6 p-4 sm:p-6 lg:p-8">
@@ -133,7 +326,8 @@ export default function ApplicantDetail() {
         <h1 className="text-3xl font-bold">Applicant Details</h1>
         <div className="flex space-x-2">
           <Link
-            onClick={() => navigate(-1)}
+            to={"/registrar/applications"}
+            onClick={(e) => { e.preventDefault(); navigate(-1); }}
             className="inline-flex items-center text-blue-600 dark:text-blue-400 px-4 py-2 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors"
           >
             <span className="mr-2">&larr;</span>
@@ -152,7 +346,7 @@ export default function ApplicantDetail() {
           <CardHeader className="text-center">
             <div className="relative mx-auto">
               <Avatar className="w-32 h-32">
-                <AvatarImage src={applicantData?.studentPhoto} />
+                <AvatarImage src={photoUrl || applicantData?.studentPhoto} />
                 <AvatarFallback className="text-2xl">
                   {applicantData.firstNameENG[0]}
                   {applicantData.fatherNameENG[0]}
@@ -402,6 +596,36 @@ export default function ApplicantDetail() {
         </CardContent>
       </Card>
 
+      {/* Applicant Document */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Download className="mr-2 h-5 w-5" /> Applicant Document
+          </CardTitle>
+          <CardDescription>Uploaded application document (PDF)</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {documentUrl ? (
+            <div className="space-y-3">
+              <div className="w-full h-96 border rounded-lg overflow-hidden">
+                <iframe title="Applicant Document" src={documentUrl} className="w-full h-full" />
+              </div>
+              <div>
+                <a
+                  href={documentUrl}
+                  download={`applicant-${id}-document.pdf`}
+                  className="inline-flex items-center px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"
+                >
+                  <Download className="mr-2 h-4 w-4" /> Download PDF
+                </a>
+              </div>
+            </div>
+          ) : (
+            <div className="text-sm text-gray-500">No document available.</div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Emergency Contact */}
       <Card>
         <CardHeader>
@@ -497,16 +721,16 @@ export default function ApplicantDetail() {
           <div className="flex space-x-4">
             <Button
               variant="default"
-              onClick={() => handleStatusChange("accepted")}
-              disabled={status !== null}
+              onClick={openAcceptModal}
+              disabled={actionBusy || status === "accepted"}
               className="bg-green-600 hover:bg-green-700"
             >
               Accept Applicant
             </Button>
             <Button
               variant="destructive"
-              onClick={() => handleStatusChange("rejected")}
-              disabled={status !== null}
+              onClick={handleRejectClick}
+              disabled={actionBusy || status === "rejected"}
             >
               Reject Applicant
             </Button>
