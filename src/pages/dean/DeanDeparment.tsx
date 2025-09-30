@@ -48,7 +48,7 @@ const fakeDepartments: Department[] = [
   },
 ];
 
-export default function RegistrarDepartments() {
+export default function DeanDepartments() {
   const [departments, setDepartments] = useState<Department[]>([]);
   const navigate = useNavigate();
 
@@ -87,7 +87,8 @@ export default function RegistrarDepartments() {
           <div
             key={dept.dptID}
             onClick={() =>
-              navigate(`/registrar/departments/${dept.departmentCode}`)
+              // navigate(`/vice-dean/departments/${dept.departmentCode}`)
+              navigate(`/dean/departments/math`)
             }
             className={`cursor-pointer h-62 rounded-3xl p-6 shadow-xl bg-gradient-to-r from-blue-500 to-blue-800 text-white flex flex-col justify-between transform hover:-translate-y-2 hover:shadow-2xl transition`}
           >

@@ -69,7 +69,17 @@ import DeanStudents from "./pages/dean/Students";
 import DeanGrades from "./pages/dean/Grades";
 import DeanReports from "./pages/dean/Reports";
 import CreateDepartmentHead from "./pages/dean/CreateDepartmentHead";
-
+import DeanDepartments from "./pages/dean/DeanDeparment";
+import DeanDepartmentDetail from "./pages/dean/DeanDepartmentsDetails";
+// Vice-Dean Pages
+import ViceDeanLayout from "./layouts/ViceDeanLayout";
+import ViceDeanDashboard from "./pages/vice-dean/Dashboard";
+import ViceDeanStudents from "./pages/vice-dean/Students";
+import ViceDeanGrades from "./pages/vice-dean/Grades";
+import ViceDeanReports from "./pages/vice-dean/Reports";
+import ViceCreateDepartmentHead from "./pages/vice-dean/CreateDepartmentHead";
+import ViceDeanDepartments from "./pages/vice-dean/ViceDepartments";
+import ViceDepartmentDetail from "./pages/vice-dean/ViceDepartmentDetail";
 // Manager Pages
 import ManagerLayout from "./layouts/ManagerLayout";
 import ManagerDashboard from "./pages/manager/Dashboard";
@@ -197,7 +207,24 @@ function App() {
             />
             <Route path="students" element={<DeanStudents />} />
             <Route path="grades" element={<DeanGrades />} />
+            <Route path="department" element={<DeanDepartments />} />
             <Route path="reports" element={<DeanReports />} />
+            <Route path="departments/:id" element={<DeanDepartmentDetail />} />
+          </Route>
+          {/*Vice Dean Routes */}
+
+          <Route path="/vice-dean" element={<ViceDeanLayout />}>
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<ViceDeanDashboard />} />
+            <Route
+              path="create-department-head"
+              element={<ViceCreateDepartmentHead />}
+            />
+            <Route path="students" element={<ViceDeanStudents />} />
+            <Route path="grades" element={<ViceDeanGrades />} />
+            <Route path="reports" element={<ViceDeanReports />} />
+            <Route path="department" element={<ViceDeanDepartments />} />
+            <Route path="departments/:id" element={<ViceDepartmentDetail />} />
           </Route>
 
           {/* Manager Routes */}

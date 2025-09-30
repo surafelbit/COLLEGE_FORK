@@ -1097,21 +1097,22 @@ export default function LandingPage() {
             </div>
           </div>
         </div>
-        <div className="relative h-[600px] px-10 ">
-          {/* Heading positioned at the top center */}
-          <h2 className="text-4xl font-bold text-blue-500 dark:text-white mb-2">
-            Our Facilities
-          </h2>
+        {window.innerWidth > 720 && (
+          <div className="relative h-[600px] px-10 ">
+            {/* Heading positioned at the top center */}
+            <h2 className="text-4xl font-bold text-blue-500 dark:text-white mb-2">
+              Our Facilities
+            </h2>
 
-          {/* Circular gallery below the heading */}
-          <CircularGallery
-            bend={3}
-            textColor="#3B82F6"
-            borderRadius={0.05}
-            scrollEase={0.02}
-          />
-        </div>
-
+            {/* Circular gallery below the heading */}
+            <CircularGallery
+              bend={3}
+              textColor="#3B82F6"
+              borderRadius={0.05}
+              scrollEase={0.02}
+            />
+          </div>
+        )}
         {/* Call to Action */}
         {/* <section className="bg-blue-600 dark:bg-blue-800 py-16"> */}
 
@@ -1181,7 +1182,7 @@ export default function LandingPage() {
                     </div>
                   </div>
                   <p className="text-blue-600 hover:text-gray-400">
-                    Excellence in medical education since 1985.
+                    Excellence in medical education since 2017.
                   </p>
                 </div>
                 <div>
@@ -1225,22 +1226,22 @@ export default function LandingPage() {
                   <h4 className="font-semibold mb-4">{t("contact")}</h4>
                   <ul className="space-y-2 ">
                     <li className="text-blue-600 hover:text-gray-400 dark:text-white dark:hover:text-gray-400">
-                      123 Medical Campus Drive
+                      Dipo Bahirdar
                     </li>
                     <li className="text-blue-600 hover:text-gray-400 dark:text-white dark:hover:text-gray-400">
-                      Berlin, Germany 10115
+                      Bahirdar, Ethiopia 10115
                     </li>
                     <li className="text-blue-600 hover:text-gray-400 dark:text-white dark:hover:text-gray-400">
-                      +49 30 1234 5678
+                      +251
                     </li>
                     <li className="text-blue-600 hover:text-gray-400 dark:text-white dark:hover:text-gray-400">
-                      info@dhfm-college.de
+                      dochebahirdar@gmail.com
                     </li>
                   </ul>
                 </div>
                 <div>
                   <h4 className="font-semibold mb-4">Follow Us</h4>
-                  <div className="flex space-x-4">
+                  <div className="flex flex-col space-x-4">
                     <Button
                       variant="ghost"
                       size="icon"
@@ -1266,10 +1267,7 @@ export default function LandingPage() {
                 </div>
               </div>
               <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-                <p>
-                  &copy; 2024 Deutsche Hochschule für Medizin College. All
-                  rights reserved.
-                </p>
+                <p>Deutsche Hochschule für Medizin College Bahirdar Website.</p>
               </div>
             </div>
           </footer>
