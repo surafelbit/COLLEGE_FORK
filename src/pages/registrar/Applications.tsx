@@ -1,31 +1,24 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { motion } from "framer-motion";
-import { Table, Button, Input } from "antd";
+// Removed unused UI imports
 import { useEffect, useMemo, useRef, useState } from "react";
 import apiService from "@/components/api/apiService";
 import endPoints from "@/components/api/endPoints";
 // import EditableTableApplicant, {
 //   DataTypes,
 // } from "@/components/Extra/EditableTableApplicant";
-import EditableTable, { DataTypes } from "@/components/Extra/EditableTable";
-import { init } from "node_modules/i18next";
+import EditableTable, { type DataTypes } from "@/components/Extra/EditableTable";
 type ApplicantRow = DataTypes;
 export default function RegistrarApplications() {
   const [searchText, setSearchText] = useState("");
   const [filteredDepartment, setFilteredDepartment] = useState("");
   const [rows, setRows] = useState<ApplicantRow[]>([]);
   const objectUrlRefs = useRef<string[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
     async function load() {
       try {
+        setLoading(true);
         const applicants = await apiService.get(endPoints.applicantsList);
         const mapped: ApplicantRow[] = (applicants || []).map((a: any) => {
           const englishName = [a.firstNameENG, a.fatherNameENG, a.grandfatherNameENG]
@@ -36,14 +29,12 @@ export default function RegistrarApplications() {
             .join(" ");
           return {
             key: String(a.id),
-            id: String(a.id),
             name: englishName || "-",
             amharicName: amharicName || "-",
             year: Number(a.classYearId) || 0,
-            batch: String(a.classYearId || "-"),
-            status: a.applicationStatus || "Pending",
             department: String(a.departmentEnrolledId || "-"),
-            photo: undefined,
+            gender: a.gender || "",
+            photo: "",
           } as ApplicantRow;
         });
 
@@ -52,7 +43,7 @@ export default function RegistrarApplications() {
           mapped.map(async (s) => {
             try {
               const blob = await apiService.get(
-                endPoints.applicantPhoto.replace(":id", s.id),
+                endPoints.applicantPhoto.replace(":id", s.key),
                 {},
                 { responseType: "blob", headers: { requiresAuth: true } }
               );
@@ -72,6 +63,9 @@ export default function RegistrarApplications() {
       } catch (_) {
         if (!cancelled) setRows([]);
       }
+      finally {
+        if (!cancelled) setLoading(false);
+      }
     }
     load();
     return () => {
@@ -87,7 +81,7 @@ export default function RegistrarApplications() {
     const matchedDeparment = filteredDepartment
         ? String(item.department) === filteredDepartment
       : true;
-      const searchable = [item.name, item.amharicName, item.id, item.department]
+      const searchable = [item.name, item.amharicName, item.department]
         .filter(Boolean)
         .join(" ")
         .toLowerCase();
@@ -130,17 +124,22 @@ export default function RegistrarApplications() {
                 <option value="Pharmacy">Pharmacy</option>
               </select>
             </div>
-            <div className="overflow-x-auto rounded-lg">
-              <EditableTable
-                initialData={filteredData}
-                className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 transition-all duration-300"
-              />
+            <div className="overflow-x-auto rounded-lg min-h-[200px] flex items-center justify-center">
+              {loading ? (
+                <div className="flex items-center justify-center py-10">
+                  <div className="animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-t-transparent"></div>
+                </div>
+              ) : filteredData.length === 0 ? (
+                <div className="text-sm text-gray-500">No data</div>
+              ) : (
+                <EditableTable initialData={filteredData} />
+              )}
             </div>
           </div>
         </div>
       </div>
       {/* Animations */}
-      <style jsx>{`
+      <style>{`
         .animate-fadeIn {
           animation: fadeIn 0.7s ease-in-out forwards;
         }
