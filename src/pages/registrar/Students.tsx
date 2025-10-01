@@ -1,11 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import EditableTableApplicant, { type DataTypes } from "@/components/Extra/EditableTableApplicant";
+import apiService from "@/components/api/apiService";
+import endPoints from "@/components/api/endPoints";
 
-const dummyStudents: DataTypes[] = [
-  { key: "1", id: "1", name: "Surafel", amharicName: "ሱራፌል", year: 4, batch: "4", status: "Student", department: "Medicine", photo: "https://i.pravatar.cc/150?img=1" },
-  { key: "2", id: "2", name: "Mekdes", amharicName: "መቅደስ", year: 2, batch: "2", status: "Student", department: "Medicine", photo: "https://i.pravatar.cc/150?img=2" },
-  { key: "3", id: "3", name: "Nahom", amharicName: "ናሆም", year: 5, batch: "5", status: "Student", department: "Medicine", photo: "https://i.pravatar.cc/150?img=3" },
-];
 
 export default function RegistrarStudents() {
   const [filters, setFilters] = useState({
@@ -14,7 +11,54 @@ export default function RegistrarStudents() {
     status: "",
   });
   const [searchText, setSearchText] = useState("");
-  const [students] = useState<DataTypes[]>(dummyStudents);
+  const [students, setStudents] = useState<DataTypes[]>([]);
+  const [loading, setLoading] = useState(true);
+  const objectUrlRefs = useRef<string[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      try {
+        setLoading(true);
+        const list = await apiService.get(endPoints.students);
+        const mapped: DataTypes[] = (list || []).map((s: any) => {
+          const englishName = [s.firstNameENG, s.fatherNameENG, s.grandfatherNameENG]
+            .filter(Boolean)
+            .join(" ");
+          const amharicName = [s.firstNameAMH, s.fatherNameAMH, s.grandfatherNameAMH]
+            .filter(Boolean)
+            .join(" ");
+          return {
+            key: String(s.id),
+            id: String(s.id),
+            name: englishName || "-",
+            amharicName: amharicName || "-",
+            year: Number(s.batchClassYearSemesterId) || 0,
+            batch: String(s.batchClassYearSemesterId || "-"),
+            status: "Student",
+            department: String(s.departmentEnrolledId || "-"),
+            photo: "",
+          } as DataTypes;
+        });
+
+        // fetch optional photos if backend supports it later
+        const withPhotos = await Promise.all(
+          mapped.map(async (row) => row)
+        );
+        if (!cancelled) setStudents(withPhotos);
+      } catch (_) {
+        if (!cancelled) setStudents([]);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    load();
+    return () => {
+      cancelled = true;
+      objectUrlRefs.current.forEach((u) => URL.revokeObjectURL(u));
+      objectUrlRefs.current = [];
+    };
+  }, []);
 
   const filteredData = useMemo(() => {
     const list = students;
@@ -148,8 +192,16 @@ export default function RegistrarStudents() {
             </div>
 
             {/* Table */}
-            <div className="overflow-x-auto rounded-2xl">
-              <EditableTableApplicant initialData={filteredData} />
+            <div className="overflow-x-auto rounded-2xl min-h-[200px] flex items-center justify-center">
+              {loading ? (
+                <div className="flex items-center justify-center py-10">
+                  <div className="animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-t-transparent"></div>
+                </div>
+              ) : filteredData.length === 0 ? (
+                <div className="text-sm text-gray-500">No data</div>
+              ) : (
+                <EditableTableApplicant initialData={filteredData} />
+              )}
             </div>
           </div>
         </div>

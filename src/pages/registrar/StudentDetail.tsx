@@ -925,11 +925,11 @@ export default function StudentProfile() {
               htmlFor="grade12ExamResult"
               className="text-gray-700 dark:text-gray-300"
             >
-              Grade 12 Exam Result
+              Document
             </Label>
             <img
-              src={studentData.grade12ExamResult}
-              alt="Grade 12 Exam Result"
+              src={studentData.document}
+              alt="Document"
               className="w-64 h-36 object-cover rounded-lg border-2 border-blue-200 dark:border-gray-700"
             />
           </div>

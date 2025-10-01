@@ -7,6 +7,7 @@ const endPoints = {
   applicantUpdateStatus: "/applicants/:id/status", // PUT
   applicantPhoto: "/applicants/:id/photo", // GET
   applicantDocument: "/applicants/:id/document", // GET
+  students: "/students", // GET
   createDepartmentHead: "/auth/create-department-head",
   createTeacher: "/auth/create-teacher",
   departmentHeads: "/department-heads",
