@@ -1,11 +1,11 @@
-// Table component
-import React from "react";
-import { Table, Button } from "antd";
+// EditableTableApplicant.tsx
+import React, { useEffect, useState } from "react";
+import { Table } from "antd";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 import { useModal } from "@/hooks/Modal";
 import { ImageModal } from "@/hooks/ImageModal";
-import { GlobalOutlined } from "@ant-design/icons";
+import apiService from "@/components/api/apiService";
+import endPoints from "@/components/api/endPoints";
 
 export interface DataTypes {
   key: string;
@@ -17,6 +17,8 @@ export interface DataTypes {
   department: string;
   photo?: string;
   batch: string;
+  // Activity flag independent of academic status
+  isDisabled?: boolean;
 }
 
 interface EditableTableProps {
@@ -26,11 +28,50 @@ interface EditableTableProps {
 const EditableTableApplicant: React.FC<EditableTableProps> = ({
   initialData,
 }) => {
-  const { openModal } = useModal();
+  const { openModal, closeModal } = useModal() as any;
   const [showAmharic, setShowAmharic] = useState(false);
+  const [data, setData] = useState<DataTypes[]>(() =>
+    (initialData || []).map((d) => ({ ...d, isDisabled: d.isDisabled ?? false }))
+  );
+
+  // keep in sync if parent provides new data
+  useEffect(() => {
+    setData((initialData || []).map((d) => ({ ...d, isDisabled: d.isDisabled ?? false })));
+  }, [initialData]);
 
   const navigate = useNavigate();
-  const [toggle, setToggle] = useState<{ [key: string]: boolean }>({});
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    showSizeChanger: true,
+    pageSizeOptions: ["5", "10", "20", "50"],
+  });
+
+  // handle deactivate / activate
+  const handleStatusChange = async (record: DataTypes, action: "disable" | "enable") => {
+    try {
+      const url =
+        action === "disable"
+          ? endPoints.studentsDeactivation.replace(":id", record.id)
+          : endPoints.studentsActivation.replace(":id", record.id);
+
+      // Server expects POST for these actions (Allow: POST)
+      await apiService.post(url, {});
+      console.log(`User ${record.id} ${action}d successfully`);
+      // reflect change locally without page refresh and keep the row visible
+      setData((prev) =>
+        prev.map((item) =>
+          item.id === record.id
+            ? { ...item, isDisabled: action === "disable" }
+            : item
+        )
+      );
+      closeModal();
+    } catch (err) {
+      console.error("Error updating status:", err);
+    }
+  };
+
   const columns = [
     {
       title: "Photo",
@@ -58,18 +99,22 @@ const EditableTableApplicant: React.FC<EditableTableProps> = ({
       title: (
         <div className="flex items-center gap-2">
           Name
+          {/* toggle amharic/english */}
           <svg
             onClick={() => setShowAmharic((prev) => !prev)}
-            width="30px"
-            height="30px"
+            width="22px"
+            height="22px"
             className="hover:cursor-pointer"
             viewBox="0 0 24 24"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M20.58 19.37L17.59 11.01C17.38 10.46 16.91 10.12 16.37 10.12C15.83 10.12 15.37 10.46 15.14 11.03L12.16 19.37C12.02 19.76 12.22 20.19 12.61 20.33C13 20.47 13.43 20.27 13.57 19.88L14.19 18.15H18.54L19.16 19.88C19.27 20.19 19.56 20.38 19.87 20.38C19.95 20.38 20.04 20.37 20.12 20.34C20.51 20.2 20.71 19.77 20.57 19.38L20.58 19.37ZM14.74 16.64L16.38 12.05L18.02 16.64H14.74ZM12.19 7.85C9.92999 11.42 7.89 13.58 5.41 15.02C5.29 15.09 5.16 15.12 5.04 15.12C4.78 15.12 4.53 14.99 4.39 14.75C4.18 14.39 4.3 13.93 4.66 13.73C6.75999 12.51 8.48 10.76 10.41 7.86H4.12C3.71 7.86 3.37 7.52 3.37 7.11C3.37 6.7 3.71 6.36 4.12 6.36H7.87V4.38C7.87 3.97 8.21 3.63 8.62 3.63C9.02999 3.63 9.37 3.97 9.37 4.38V6.36H13.12C13.53 6.36 13.87 6.7 13.87 7.11C13.87 7.52 13.53 7.86 13.12 7.86H12.18L12.19 7.85ZM12.23 15.12C12.1 15.12 11.97 15.09 11.85 15.02C11.2 14.64 10.57 14.22 9.97999 13.78C9.64999 13.53 9.58 13.06 9.83 12.73C10.08 12.4 10.55 12.33 10.88 12.58C11.42 12.99 12.01 13.37 12.61 13.72C12.97 13.93 13.09 14.39 12.88 14.75C12.74 14.99 12.49 15.12 12.23 15.12Z"
-              fill="#000000"
+              d="M12 20h9M3 4h18M4 20l7-16"
+              stroke="#000"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
           </svg>
         </div>
@@ -79,7 +124,6 @@ const EditableTableApplicant: React.FC<EditableTableProps> = ({
       render: (_: any, record: DataTypes) =>
         showAmharic ? record.amharicName : record.name,
     },
-
     {
       title: "Status",
       dataIndex: "status",
@@ -117,21 +161,22 @@ const EditableTableApplicant: React.FC<EditableTableProps> = ({
     { title: "Batch", dataIndex: "batch", width: "12%" },
     { title: "Year", dataIndex: "year", width: "10%" },
     { title: "Department", dataIndex: "department", width: "11%" },
-
-    // {
-    //   title: "Action",
-    //   dataIndex: "action",
-
-    //   render: (_: any, record: DataTypes) => (
-    //     <Button
-    //       type="primary"
-    //       onClick={() => navigate(`/student/${record.key}`)}
-    //       className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-    //     >
-    //       Details
-    //     </Button>
-    //   ),
-    // },
+    {
+      title: "Account Status",
+      dataIndex: "accountStatus",
+      width: "10%",
+      render: (_: any, record: DataTypes) => (
+        <span
+          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
+            record.isDisabled
+              ? "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/30 dark:text-rose-200 dark:border-rose-800"
+              : "bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-200 dark:border-green-800"
+          }`}
+        >
+          {record.isDisabled ? "Suspended" : "Active"}
+        </span>
+      ),
+    },
     {
       title: "Regulate Activity",
       dataIndex: "action",
@@ -141,93 +186,102 @@ const EditableTableApplicant: React.FC<EditableTableProps> = ({
           onClick={(e) => {
             e.stopPropagation();
 
-            // setToggle((prev) => ({ ...prev, [record.key]: !prev[record.key] }));
             openModal(
               <div className="p-6 rounded-xl shadow-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 w-96">
-                <h2 className="text-xl font-bold mb-4">Are you sure?</h2>
-                <p className="mb-6">
-                  Do you really want to deactivate this user? This action cannot
-                  be undone.
+                <h2 className="text-xl font-bold mb-4">Regulate Student Activity</h2>
+                <p className="mb-4">
+                  Choose an action. This is independent of the student's academic status.
                 </p>
                 <div className="flex justify-end gap-3">
                   <button
-                    onClick={() => console.log("Cancelled")}
+                    onClick={closeModal}
                     className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition"
                   >
                     Cancel
                   </button>
                   <button
-                    onClick={() => console.log("Deactivated")}
+                    onClick={async () => {
+                      await handleStatusChange(record, "disable");
+                    }}
                     className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white transition"
                   >
                     Deactivate
+                  </button>
+                  <button
+                    onClick={async () => {
+                      await handleStatusChange(record, "enable");
+                    }}
+                    className="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white transition"
+                  >
+                    Activate
                   </button>
                 </div>
               </div>
             );
           }}
         >
-          <svg
-            width="30px"
-            height="30px"
-            viewBox="0 0 24 24"
-            id="three-dots"
-            // xmlns="http://www.w3.org/2000/svg"
-          >
-            <g
-              id="_20x20_three-dots--grey"
-              data-name="20x20/three-dots--grey"
-              transform="translate(24) rotate(90)"
+          <span className="inline-flex items-center gap-2">
+            {/* User state icon: check for active, x for suspended */}
+            {record.isDisabled ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-rose-600"
+              >
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+                <line x1="15" y1="9" x2="21" y2="3" />
+                <line x1="21" y1="9" x2="15" y2="3" />
+              </svg>
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-green-600"
+              >
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+                <path d="M16 11l2 2 4-4" />
+              </svg>
+            )}
+
+            {/* Three dots (kebab) icon */}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="text-gray-600 dark:text-gray-300 hover:text-blue-500 cursor-pointer"
             >
-              <rect id="Rectangle" width="24" height="24" fill="none" />
-              <circle
-                id="Oval"
-                cx="1"
-                cy="1"
-                r="1"
-                transform="translate(5 11)"
-                stroke="#000000"
-                stroke-miterlimit="10"
-                stroke-width="0.5"
-              />
-              <circle
-                id="Oval-2"
-                data-name="Oval"
-                cx="1"
-                cy="1"
-                r="1"
-                transform="translate(11 11)"
-                stroke="#000000"
-                stroke-miterlimit="10"
-                stroke-width="0.5"
-              />
-              <circle
-                id="Oval-3"
-                data-name="Oval"
-                cx="1"
-                cy="1"
-                r="1"
-                transform="translate(17 11)"
-                stroke="#000000"
-                stroke-miterlimit="10"
-                stroke-width="0.5"
-              />
-            </g>
-          </svg>
+              <circle cx="12" cy="5" r="2" />
+              <circle cx="12" cy="12" r="2" />
+              <circle cx="12" cy="19" r="2" />
+            </svg>
+          </span>
         </span>
       ),
     },
   ];
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pageSize: 10,
-    showSizeChanger: true,
-    pageSizeOptions: ["5", "10", "20", "50"],
-  });
+
   return (
     <div>
       <Table<DataTypes>
-        dataSource={initialData}
+        dataSource={data}
         columns={columns}
         rowKey={(record, index) => `${record.key}-${index}`}
         pagination={{
@@ -241,12 +295,17 @@ const EditableTableApplicant: React.FC<EditableTableProps> = ({
         }}
         bordered={false}
         className="min-w-full bg-gray-100 dark:bg-gray-800"
-        rowClassName={() =>
-          "bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+        rowClassName={(record) =>
+          `bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 ${
+            record.isDisabled ? "bg-red-50 dark:bg-red-900/40" : ""
+          }`
         }
         onRow={(record) => {
           return {
             onClick: () => navigate(`/registrar/students/${record.key}`),
+            style: record.isDisabled
+              ? { backgroundColor: "#fde2e2" }
+              : undefined,
           };
         }}
         components={{
@@ -255,10 +314,10 @@ const EditableTableApplicant: React.FC<EditableTableProps> = ({
               <th
                 {...props}
                 className="
-            bg-white dark:bg-gray-900 
-            text-gray-900 dark:text-gray-100
-            px-4 py-2 text-left
-          "
+                  bg-white dark:bg-gray-900 
+                  text-gray-900 dark:text-gray-100
+                  px-4 py-2 text-left
+                "
               />
             ),
           },
@@ -266,13 +325,15 @@ const EditableTableApplicant: React.FC<EditableTableProps> = ({
             row: (props) => (
               <tr
                 {...props}
-                className="
-            bg-white dark:bg-gray-900 
-            text-gray-900 dark:text-gray-100
-            hover:bg-blue-200 dark:hover:bg-gray-600 
-            transition-colors
-            cursor-pointer
-          "
+                className={`
+                  ${props.className || ""}
+                  bg-white dark:bg-gray-900 
+                  text-gray-900 dark:text-gray-100
+                  hover:bg-blue-200 dark:hover:bg-gray-600 
+                  transition-colors
+                  cursor-pointer
+                `}
+                style={props.style}
               />
             ),
           },

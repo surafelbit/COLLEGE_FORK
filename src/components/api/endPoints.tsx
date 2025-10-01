@@ -8,6 +8,8 @@ const endPoints = {
   applicantPhoto: "/applicants/:id/photo", // GET
   applicantDocument: "/applicants/:id/document", // GET
   students: "/students", // GET
+  studentsDeactivation : "/students/:id/disable" ,
+  studentsActivation : "/students/:id/enable" ,
   createDepartmentHead: "/auth/create-department-head",
   createTeacher: "/auth/create-teacher",
   departmentHeads: "/department-heads",
