@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { UserPlus } from "lucide-react";
 import { Bar, Line, Pie } from "react-chartjs-2";
+import { useLocation } from "react-router-dom";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -74,8 +75,18 @@ const gradeDistribution = {
 
 const upcomingEvents = [
   { id: 1, title: "Midterm Exams", date: "Oct 12", note: "All departments" },
-  { id: 2, title: "Grade Submission Deadline", date: "Oct 25", note: "Semester 1" },
-  { id: 3, title: "Results Announcement", date: "Nov 02", note: "Portal + Notice" },
+  {
+    id: 2,
+    title: "Grade Submission Deadline",
+    date: "Oct 25",
+    note: "Semester 1",
+  },
+  {
+    id: 3,
+    title: "Results Announcement",
+    date: "Nov 02",
+    note: "Portal + Notice",
+  },
 ];
 
 const alerts = [
@@ -88,7 +99,7 @@ const topBottom = {
   top: [
     { id: 1, name: "Alice Johnson", gpa: 3.98, dept: "Radiology" },
     { id: 2, name: "Michael Lee", gpa: 3.92, dept: "Medicine" },
-    { id: 3, name: "Sophia Brown", gpa: 3.90, dept: "Pharmacy" },
+    { id: 3, name: "Sophia Brown", gpa: 3.9, dept: "Pharmacy" },
   ],
   bottom: [
     { id: 11, name: "Chris Green", gpa: 1.92, dept: "Dentistry" },
@@ -98,26 +109,49 @@ const topBottom = {
 };
 
 export default function DeanDashboard() {
+  const location = useLocation();
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
       <div className="p-6 space-y-6 max-w-7xl mx-auto">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-blue-600 dark:text-blue-400">Dean Dashboard</h1>
-          <Link to="/dean/create-department-head">
-            <Button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700">
-              <UserPlus className="h-4 w-4" />
-              Create Department Head
-            </Button>
-          </Link>
+          {!location.pathname.includes("general-manager") ? (
+            <h1 className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+              Dean Dashboard
+            </h1>
+          ) : (
+            <h1 className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+              Manager Dashboard
+            </h1>
+          )}
+          {!location.pathname.includes("general-manager") && (
+            <Link to="/dean/create-department-head">
+              <Button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700">
+                <UserPlus className="h-4 w-4" />
+                Create Department Head
+              </Button>
+            </Link>
+          )}
         </div>
 
         {/* Totals */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[{label:"Students", value: totals.students}, {label:"Courses", value: totals.courses}, {label:"Departments", value: totals.departments}, {label:"Faculty", value: totals.faculty}].map((m) => (
-            <Card key={m.label} className="bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow">
+          {[
+            { label: "Students", value: totals.students },
+            { label: "Courses", value: totals.courses },
+            { label: "Departments", value: totals.departments },
+            { label: "Faculty", value: totals.faculty },
+          ].map((m) => (
+            <Card
+              key={m.label}
+              className="bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow"
+            >
               <CardContent className="p-6">
-                <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">{m.label}</h3>
-                <p className="text-4xl font-bold text-blue-600 dark:text-blue-400">{m.value}</p>
+                <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  {m.label}
+                </h3>
+                <p className="text-4xl font-bold text-blue-600 dark:text-blue-400">
+                  {m.value}
+                </p>
               </CardContent>
             </Card>
           ))}
@@ -127,12 +161,25 @@ export default function DeanDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <Card className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg lg:col-span-2">
             <CardContent className="p-6 space-y-3">
-              <h2 className="text-2xl font-bold text-blue-600 dark:text-blue-400">Quick Alerts</h2>
+              <h2 className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                Quick Alerts
+              </h2>
               <ul className="space-y-2">
                 {alerts.map((a) => (
-                  <li key={a.id} className="flex items-center justify-between rounded-xl border border-gray-200 dark:border-gray-700 px-4 py-3">
-                    <span className="text-sm text-gray-700 dark:text-gray-300">{a.text}</span>
-                    <Button size="sm" variant="outline" className="border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400">View</Button>
+                  <li
+                    key={a.id}
+                    className="flex items-center justify-between rounded-xl border border-gray-200 dark:border-gray-700 px-4 py-3"
+                  >
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      {a.text}
+                    </span>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
+                    >
+                      View
+                    </Button>
                   </li>
                 ))}
               </ul>
@@ -141,39 +188,70 @@ export default function DeanDashboard() {
 
           <Card className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg">
             <CardContent className="p-6 space-y-4">
-              <h2 className="text-2xl font-bold text-blue-600 dark:text-blue-400">Upcoming</h2>
+              <h2 className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                Upcoming
+              </h2>
               <ul className="space-y-3">
                 {upcomingEvents.map((e) => (
-                  <li key={e.id} className="rounded-xl border border-gray-200 dark:border-gray-700 p-3">
-                    <p className="font-medium text-blue-600 dark:text-blue-400">{e.title}</p>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">{e.date} • {e.note}</p>
+                  <li
+                    key={e.id}
+                    className="rounded-xl border border-gray-200 dark:border-gray-700 p-3"
+                  >
+                    <p className="font-medium text-blue-600 dark:text-blue-400">
+                      {e.title}
+                    </p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                      {e.date} • {e.note}
+                    </p>
                   </li>
                 ))}
               </ul>
-              <Button className="w-full bg-blue-600 text-white hover:bg-blue-700">Add Event</Button>
+              <Button className="w-full bg-blue-600 text-white hover:bg-blue-700">
+                Add Event
+              </Button>
             </CardContent>
           </Card>
         </div>
 
         {/* Analytics */}
         <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-blue-600 dark:text-blue-400">Analytics</h2>
+          <h2 className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+            Analytics
+          </h2>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <Card className="bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-lg transition-shadow">
               <CardContent className="p-4">
-                <h3 className="text-lg font-semibold text-blue-600 dark:text-blue-400 mb-2">Average GPA by Department</h3>
-                <Bar data={avgGpaByDept} options={{ responsive: true, plugins: { legend: { display: false } } }} />
+                <h3 className="text-lg font-semibold text-blue-600 dark:text-blue-400 mb-2">
+                  Average GPA by Department
+                </h3>
+                <Bar
+                  data={avgGpaByDept}
+                  options={{
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                  }}
+                />
               </CardContent>
             </Card>
             <Card className="bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-lg transition-shadow">
               <CardContent className="p-4">
-                <h3 className="text-lg font-semibold text-blue-600 dark:text-blue-400 mb-2">Attendance Trend</h3>
-                <Line data={attendanceTrend} options={{ responsive: true, plugins: { legend: { display: true } } }} />
+                <h3 className="text-lg font-semibold text-blue-600 dark:text-blue-400 mb-2">
+                  Attendance Trend
+                </h3>
+                <Line
+                  data={attendanceTrend}
+                  options={{
+                    responsive: true,
+                    plugins: { legend: { display: true } },
+                  }}
+                />
               </CardContent>
             </Card>
             <Card className="bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-lg transition-shadow">
               <CardContent className="p-4">
-                <h3 className="text-lg font-semibold text-blue-600 dark:text-blue-400 mb-2">Grade Distribution</h3>
+                <h3 className="text-lg font-semibold text-blue-600 dark:text-blue-400 mb-2">
+                  Grade Distribution
+                </h3>
                 <Pie data={gradeDistribution} />
               </CardContent>
             </Card>
@@ -184,12 +262,21 @@ export default function DeanDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg">
             <CardContent className="p-6">
-              <h3 className="text-xl font-semibold text-blue-600 dark:text-blue-400 mb-3">Top Performing Students</h3>
+              <h3 className="text-xl font-semibold text-blue-600 dark:text-blue-400 mb-3">
+                Top Performing Students
+              </h3>
               <div className="space-y-2">
                 {topBottom.top.map((s) => (
-                  <div key={s.id} className="flex items-center justify-between rounded-xl border border-gray-200 dark:border-gray-700 px-4 py-2">
-                    <span className="text-sm text-gray-700 dark:text-gray-300">{s.name} • {s.dept}</span>
-                    <span className="text-blue-600 dark:text-blue-400 font-semibold">GPA {s.gpa.toFixed(2)}</span>
+                  <div
+                    key={s.id}
+                    className="flex items-center justify-between rounded-xl border border-gray-200 dark:border-gray-700 px-4 py-2"
+                  >
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      {s.name} • {s.dept}
+                    </span>
+                    <span className="text-blue-600 dark:text-blue-400 font-semibold">
+                      GPA {s.gpa.toFixed(2)}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -197,17 +284,26 @@ export default function DeanDashboard() {
           </Card>
           <Card className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg">
             <CardContent className="p-6">
-              <h3 className="text-xl font-semibold text-blue-600 dark:text-blue-400 mb-3">Underperforming Students</h3>
+              <h3 className="text-xl font-semibold text-blue-600 dark:text-blue-400 mb-3">
+                Underperforming Students
+              </h3>
               <div className="space-y-2">
                 {topBottom.bottom.map((s) => (
-                  <div key={s.id} className="flex items-center justify-between rounded-xl border border-gray-200 dark:border-gray-700 px-4 py-2">
-                    <span className="text-sm text-gray-700 dark:text-gray-300">{s.name} • {s.dept}</span>
-                    <span className="text-red-600 dark:text-red-400 font-semibold">GPA {s.gpa.toFixed(2)}</span>
+                  <div
+                    key={s.id}
+                    className="flex items-center justify-between rounded-xl border border-gray-200 dark:border-gray-700 px-4 py-2"
+                  >
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      {s.name} • {s.dept}
+                    </span>
+                    <span className="text-red-600 dark:text-red-400 font-semibold">
+                      GPA {s.gpa.toFixed(2)}
+                    </span>
                   </div>
                 ))}
               </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

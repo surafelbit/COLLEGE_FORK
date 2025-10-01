@@ -92,6 +92,11 @@ import ProgramModalitiesEditor from "./pages/registrar/settings/ProgramModalitie
 import AttritionCausesEditor from "./pages/registrar/settings/AttritionCausesEditor";
 import SemestersEditor from "./pages/registrar/settings/SemestersEditor";
 import ClassYearsEditor from "./pages/registrar/settings/ClassYearsEditor";
+import ManagerStudents from "./pages/manager/ManagerStudents";
+import ManagerTeachers from "./pages/manager/ManagerTeachers";
+import DeanProfile from "./pages/manager/DeanProfile";
+import ViceDeanProfile from "./pages/manager/ViceDeanProfile";
+import RegistrarProfile from "./pages/manager/RegistrarProfile";
 function App() {
   return (
     <ThemeProvider defaultTheme="light" storageKey="college-ui-theme">
@@ -228,10 +233,18 @@ function App() {
           </Route>
 
           {/* Manager Routes */}
-          <Route path="/manager" element={<ManagerLayout />}>
-            <Route path="dashboard" element={<ManagerDashboard />} />
-            <Route path="reports" element={<ManagerReports />} />
+          <Route path="/general-manager" element={<ManagerLayout />}>
+            <Route path="dashboard" element={<DeanDashboard />} />
+            <Route path="students" element={<ManagerStudents />} />
+            <Route path="students/:id" element={<StudentDetail />} />
+            <Route path="reports" element={<DeanReports />} />
+            <Route path="department" element={<DeanDepartments />} />
+            <Route path="departments/:id" element={<DeanDepartmentDetail />} />
             <Route path="settings" element={<ManagerSettings />} />
+            <Route path="teachers" element={<ManagerTeachers />} />
+            <Route path="dean" element={<DeanProfile />} />
+            <Route path="vice-dean" element={<ViceDeanProfile />} />
+            <Route path="registrar" element={<RegistrarProfile />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
