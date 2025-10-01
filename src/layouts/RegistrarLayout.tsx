@@ -21,6 +21,9 @@ import { useNavigate } from "react-router-dom";
 export default function RegistrarLayout() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [listOpen, setListOpen] = useState(() => {
+    return window.innerWidth >= 1024;
+  });
   const [sidebarOpen, setSidebarOpen] = useState(() => {
     // Initial check: if large screen (≥ 1024px), open sidebar
     return window.innerWidth >= 1024;
@@ -530,23 +533,46 @@ export default function RegistrarLayout() {
                   </div>
                 )}
               </div>
-
-              {/* User info */}
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+            </div>
+            {/* User info */}
+            <div className="flex items-center space-x-2">
+              {window.innerWidth < 720 && (
+                <div
+                  className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center"
+                  onClick={() => setListOpen((prev) => !prev)}
+                >
                   <span className="text-white text-sm font-medium">RG</span>
                 </div>
-                {window.innerWidth > 720 && (
-                  <div className=" ">
+              )}
+              {window.innerWidth > 720 && (
+                <div className="lg:flex items-center gap-x-4 ml-2 ">
+                  <div className="text-sm font-medium text-gray-900 dark:text-white">
+                    Registrar
+                  </div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                    Academic Records
+                  </div>
+                  <Button>Logout</Button>
+                </div>
+              )}
+              {listOpen && (
+                <div className="absolute top-12 right-0 lg:hidden w-48 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-3 z-50">
+                  <div className="mb-2">
                     <div className="text-sm font-medium text-gray-900 dark:text-white">
-                      Registrar
+                      Student
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400">
                       Academic Records
                     </div>
                   </div>
-                )}
-              </div>
+                  <Button
+                    className="w-full"
+                    onClick={() => console.log("Logout")}
+                  >
+                    Logout
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </div>

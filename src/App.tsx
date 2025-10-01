@@ -234,6 +234,7 @@ function App() {
 
           {/* Manager Routes */}
           <Route path="/general-manager" element={<ManagerLayout />}>
+            <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<DeanDashboard />} />
             <Route path="students" element={<ManagerStudents />} />
             <Route path="students/:id" element={<StudentDetail />} />

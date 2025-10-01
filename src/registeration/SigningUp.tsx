@@ -16,20 +16,22 @@ import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { Loader2 } from "lucide-react";
 
 export default function SignInPage() {
   const { t } = useTranslation(["auth", "common"]);
   const navigate = useNavigate();
 
   // State to capture user input
+  const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [response, setResponse] = useState(null);
   const [error, setError] = useState(null);
 
   // Submit handler
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
+    setIsLoading(true);
 
     const formData = {
       username: email,
@@ -41,9 +43,10 @@ export default function SignInPage() {
         headers: { requiresAuth: false },
       });
       setResponse(responses.message);
+      setIsLoading(false);
       console.log(responses);
       localStorage.setItem("xy9a7b", responses.jwt);
-      
+      console.log(responses.role);
       // Navigate based on role from backend
       switch (responses.role) {
         case "REGISTRAR":
@@ -52,6 +55,9 @@ export default function SignInPage() {
         case "STUDENT":
           navigate("/student");
           break;
+        case "GENERAL_MANAGER":
+          navigate("/general-manager");
+          break;
         case "DEAN":
           navigate("/dean");
           break;
@@ -59,8 +65,11 @@ export default function SignInPage() {
           console.log("Role not handled:", responses.role);
       }
     } catch (err) {
+      setIsLoading(false);
+
       setError(err?.responses?.data?.error || "failed to login");
-      console.log(err.responses.data.error);
+      console.log(err?.responses?.data?.error);
+
       console.error("Error:", err);
     }
   };
@@ -85,8 +94,12 @@ export default function SignInPage() {
         <div className="w-full max-w-md mx-auto">
           <Card className="shadow-2xl border-0">
             <CardHeader className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 bg-blue-600 rounded-full flex items-center justify-center">
-                <GraduationCap className="h-8 w-8 text-white" />
+              <div className="w-30 h-30 mx-auto mb-4 bg-blue-600 rounded-full flex items-center justify-center">
+                {/* <GraduationCap className="h-8 w-8 text-white" /> */}
+                <img
+                  src="/assets/companylogo.jpg"
+                  className="h-30 w-30  rounded-full object-cover"
+                />
               </div>
               <CardTitle className="text-2xl">{t("welcomeBack")}</CardTitle>
               <CardDescription>{t("signInToAccount")}</CardDescription>
@@ -94,11 +107,11 @@ export default function SignInPage() {
             <CardContent className="space-y-4">
               {/* Email input */}
               <div className="space-y-2">
-                <Label htmlFor="email">{t("common:email")}</Label>
+                <Label htmlFor="email">Username</Label>
                 <Input
                   id="email"
-                  type="email"
-                  placeholder="your.email@dhfm-college.de"
+                  type="text"
+                  placeholder="Enter Your Username"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
@@ -116,14 +129,43 @@ export default function SignInPage() {
                 />
               </div>
 
-              <Button onClick={handleSubmit} className="w-full">
+              {/* <Button onClick={handleSubmit} className="w-full">
                 {t("signIn")}
+              </Button> */}
+              <Button
+                onClick={() => {
+                  handleSubmit();
+                  setError(false);
+                  setResponse(false);
+                }}
+                disabled={isLoading} // disable button while waiting
+                className="w-full flex items-center justify-center gap-2"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Signing in...</span>
+                  </>
+                ) : (
+                  t("signIn")
+                )}
               </Button>
 
               {response && (
-                <p className="text-green-600">{JSON.stringify(response)}</p>
+                <div className="mt-4 p-2 rounded-lg border border-green-400 bg-green-100">
+                  <p className="text-sm text-green-700 font-medium">
+                    {response}
+                  </p>
+                </div>
               )}
-              {error && <p className="text-red-600">{JSON.stringify(error)}</p>}
+              {error && (
+                // <div className="border-red-700 p-2 bg-red-200">
+                //   <p className="text-red-600">{JSON.stringify(error)}</p>
+                // </div>
+                <div className="mt-4 p-2 rounded-lg border border-red-400 bg-red-100">
+                  <p className="text-sm text-red-700 font-medium">{error}</p>
+                </div>
+              )}
 
               <div className="text-center">
                 <div className="text-sm text-gray-600 dark:text-gray-400">
