@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -25,6 +26,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 export default function StudentProfile() {
+  const location = useLocation();
+  let userRole;
+  if (location.pathname.includes("registrar")) {
+    userRole = "registrar";
+  } else {
+    userRole = "general-manager";
+  }
   const navigate = useNavigate();
   const [passwordForm, setPasswordForm] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -34,6 +42,7 @@ export default function StudentProfile() {
     confirmPassword: "",
   });
   const [error, setError] = useState("");
+  // const [userRole, setUserRole] = useState("registrar"); // Default to registrar
   const [editableData, setEditableData] = useState({
     firstNameAMH: "አበበ",
     firstNameENG: "Abebe",
@@ -151,15 +160,17 @@ export default function StudentProfile() {
     alert(`Profile updated for ${editableData.firstNameENG}`);
     setEditMode(false);
   };
-  const [openYear, setOpenYear] = useState({ index: null });
-  const [openYears, setOpenYears] = useState({});
-  const [openSemesters, setOpenSemesters] = useState({});
-  const [selectedGradingSystem, setSelectedGradingSystem] = useState("system1");
 
   const handleCancel = () => {
     setEditableData(originalData);
     setEditMode(false);
   };
+
+  const [openYear, setOpenYear] = useState({ index: null });
+  const [openYears, setOpenYears] = useState({});
+  const [openSemesters, setOpenSemesters] = useState({});
+  const [selectedGradingSystem, setSelectedGradingSystem] = useState("system1");
+
   const initialResult = [
     {
       year: 1,
@@ -400,6 +411,7 @@ export default function StudentProfile() {
       return "F";
     },
   };
+
   useEffect(() => {
     const updatedResult = initialResult.map((year) => ({
       ...year,
@@ -413,6 +425,10 @@ export default function StudentProfile() {
     }));
     setDisplayedResult(updatedResult);
   }, [selectedGradingSystem]);
+
+  // Determine if the profile is editable based on userRole
+  const isEditable = userRole === "registrar";
+
   return (
     <div className="space-y-6 p-4 sm:p-6 lg:p-8 bg-white dark:bg-gray-900">
       <div className="flex justify-between items-center">
@@ -427,29 +443,33 @@ export default function StudentProfile() {
             <span className="mr-2">&larr;</span>
             <span>Back to Student List</span>
           </Link>
-          {editMode ? (
+          {isEditable && (
             <>
-              <Button
-                onClick={handleSave}
-                className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-white"
-              >
-                Save
-              </Button>
-              <Button
-                onClick={handleCancel}
-                className="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600 text-white"
-              >
-                Cancel
-              </Button>
+              {editMode ? (
+                <>
+                  <Button
+                    onClick={handleSave}
+                    className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-white"
+                  >
+                    Save
+                  </Button>
+                  <Button
+                    onClick={handleCancel}
+                    className="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600 text-white"
+                  >
+                    Cancel
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  onClick={() => setEditMode(true)}
+                  className="bg-blue-600 hover:bg-blue-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white"
+                >
+                  <Edit className="mr-2 h-4 w-4" />
+                  Edit Profile
+                </Button>
+              )}
             </>
-          ) : (
-            <Button
-              onClick={() => setEditMode(true)}
-              className="bg-blue-600 hover:bg-blue-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white"
-            >
-              <Edit className="mr-2 h-4 w-4" />
-              Edit Profile
-            </Button>
           )}
         </div>
       </div>
@@ -465,13 +485,15 @@ export default function StudentProfile() {
                   {studentData.fatherNameENG[0]}
                 </AvatarFallback>
               </Avatar>
-              <Button
-                size="icon"
-                variant="secondary"
-                className="absolute bottom-0 right-0 rounded-full bg-blue-600 hover:bg-blue-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white"
-              >
-                <Camera className="h-4 w-4" />
-              </Button>
+              {isEditable && (
+                <Button
+                  size="icon"
+                  variant="secondary"
+                  className="absolute bottom-0 right-0 rounded-full bg-blue-600 hover:bg-blue-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white"
+                >
+                  <Camera className="h-4 w-4" />
+                </Button>
+              )}
             </div>
             <CardTitle className="mt-4 text-blue-600 dark:text-gray-100">
               {studentData.firstNameENG} {studentData.fatherNameENG}
@@ -533,7 +555,7 @@ export default function StudentProfile() {
                   name="firstNameAMH"
                   value={editableData.firstNameAMH}
                   onChange={handleEditChange}
-                  readOnly={!editMode}
+                  readOnly={!editMode || !isEditable}
                   className="border-blue-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-gray-500 text-gray-900 dark:text-gray-100"
                 />
               </div>
@@ -549,7 +571,7 @@ export default function StudentProfile() {
                   name="firstNameENG"
                   value={editableData.firstNameENG}
                   onChange={handleEditChange}
-                  readOnly={!editMode}
+                  readOnly={!editMode || !isEditable}
                   className="border-blue-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-gray-500 text-gray-900 dark:text-gray-100"
                 />
               </div>
@@ -568,7 +590,7 @@ export default function StudentProfile() {
                   name="fatherNameAMH"
                   value={editableData.fatherNameAMH}
                   onChange={handleEditChange}
-                  readOnly={!editMode}
+                  readOnly={!editMode || !isEditable}
                   className="border-blue-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-gray-500 text-gray-900 dark:text-gray-100"
                 />
               </div>
@@ -584,7 +606,7 @@ export default function StudentProfile() {
                   name="fatherNameENG"
                   value={editableData.fatherNameENG}
                   onChange={handleEditChange}
-                  readOnly={!editMode}
+                  readOnly={!editMode || !isEditable}
                   className="border-blue-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-gray-500 text-gray-900 dark:text-gray-100"
                 />
               </div>
@@ -603,7 +625,7 @@ export default function StudentProfile() {
                   name="grandfatherNameAMH"
                   value={editableData.grandfatherNameAMH}
                   onChange={handleEditChange}
-                  readOnly={!editMode}
+                  readOnly={!editMode || !isEditable}
                   className="border-blue-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-gray-500 text-gray-900 dark:text-gray-100"
                 />
               </div>
@@ -619,7 +641,7 @@ export default function StudentProfile() {
                   name="grandfatherNameENG"
                   value={editableData.grandfatherNameENG}
                   onChange={handleEditChange}
-                  readOnly={!editMode}
+                  readOnly={!editMode || !isEditable}
                   className="border-blue-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-gray-500 text-gray-900 dark:text-gray-100"
                 />
               </div>
@@ -638,7 +660,7 @@ export default function StudentProfile() {
                   name="motherNameAMH"
                   value={editableData.motherNameAMH}
                   onChange={handleEditChange}
-                  readOnly={!editMode}
+                  readOnly={!editMode || !isEditable}
                   className="border-blue-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-gray-500 text-gray-900 dark:text-gray-100"
                 />
               </div>
@@ -654,7 +676,7 @@ export default function StudentProfile() {
                   name="motherNameENG"
                   value={editableData.motherNameENG}
                   onChange={handleEditChange}
-                  readOnly={!editMode}
+                  readOnly={!editMode || !isEditable}
                   className="border-blue-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-gray-500 text-gray-900 dark:text-gray-100"
                 />
               </div>
@@ -673,7 +695,7 @@ export default function StudentProfile() {
                   name="motherFatherNameAMH"
                   value={editableData.motherFatherNameAMH}
                   onChange={handleEditChange}
-                  readOnly={!editMode}
+                  readOnly={!editMode || !isEditable}
                   className="border-blue-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-gray-500 text-gray-900 dark:text-gray-100"
                 />
               </div>
@@ -689,7 +711,7 @@ export default function StudentProfile() {
                   name="motherFatherNameENG"
                   value={editableData.motherFatherNameENG}
                   onChange={handleEditChange}
-                  readOnly={!editMode}
+                  readOnly={!editMode || !isEditable}
                   className="border-blue-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-gray-500 text-gray-900 dark:text-gray-100"
                 />
               </div>
@@ -709,7 +731,7 @@ export default function StudentProfile() {
                   value={editableData.dateOfBirthGC}
                   onChange={handleEditChange}
                   type="date"
-                  readOnly={!editMode}
+                  readOnly={!editMode || !isEditable}
                   className="border-blue-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-gray-500 text-gray-900 dark:text-gray-100"
                 />
               </div>
@@ -725,7 +747,7 @@ export default function StudentProfile() {
                   name="gender"
                   value={editableData.gender}
                   onChange={handleEditChange}
-                  readOnly={!editMode}
+                  readOnly={!editMode || !isEditable}
                   className="border-blue-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-gray-500 text-gray-900 dark:text-gray-100"
                 />
               </div>
@@ -745,7 +767,7 @@ export default function StudentProfile() {
                 name="currentAddressWoreda"
                 value={editableData.currentAddressWoreda}
                 onChange={handleEditChange}
-                readOnly={!editMode}
+                readOnly={!editMode || !isEditable}
                 className="border-blue-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-gray-500 text-gray-900 dark:text-gray-100"
               />
             </div>
@@ -761,7 +783,7 @@ export default function StudentProfile() {
                 name="currentAddressZone"
                 value={editableData.currentAddressZone}
                 onChange={handleEditChange}
-                readOnly={!editMode}
+                readOnly={!editMode || !isEditable}
                 className="border-blue-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-gray-500 text-gray-900 dark:text-gray-100"
               />
             </div>
@@ -777,7 +799,7 @@ export default function StudentProfile() {
                 name="currentAddressRegion"
                 value={editableData.currentAddressRegion}
                 onChange={handleEditChange}
-                readOnly={!editMode}
+                readOnly={!editMode || !isEditable}
                 className="border-blue-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-gray-500 text-gray-900 dark:text-gray-100"
               />
             </div>
@@ -794,7 +816,7 @@ export default function StudentProfile() {
                 name="placeOfBirthWoreda"
                 value={editableData.placeOfBirthWoreda}
                 onChange={handleEditChange}
-                readOnly={!editMode}
+                readOnly={!editMode || !isEditable}
                 className="border-blue-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-gray-500 text-gray-900 dark:text-gray-100"
               />
             </div>
@@ -810,7 +832,7 @@ export default function StudentProfile() {
                 name="placeOfBirthZone"
                 value={editableData.placeOfBirthZone}
                 onChange={handleEditChange}
-                readOnly={!editMode}
+                readOnly={!editMode || !isEditable}
                 className="border-blue-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-gray-500 text-gray-900 dark:text-gray-100"
               />
             </div>
@@ -826,7 +848,7 @@ export default function StudentProfile() {
                 name="placeOfBirthRegion"
                 value={editableData.placeOfBirthRegion}
                 onChange={handleEditChange}
-                readOnly={!editMode}
+                readOnly={!editMode || !isEditable}
                 className="border-blue-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-gray-500 text-gray-900 dark:text-gray-100"
               />
             </div>
@@ -858,7 +880,7 @@ export default function StudentProfile() {
                 name="departmentEnrolled"
                 value={editableData.departmentEnrolled}
                 onChange={handleEditChange}
-                readOnly={!editMode}
+                readOnly={!editMode || !isEditable}
                 className="border-blue-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-gray-500 text-gray-900 dark:text-gray-100"
               />
             </div>
@@ -874,7 +896,7 @@ export default function StudentProfile() {
                 name="programModality"
                 value={editableData.programModality}
                 onChange={handleEditChange}
-                readOnly={!editMode}
+                readOnly={!editMode || !isEditable}
                 className="border-blue-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-gray-500 text-gray-900 dark:text-gray-100"
               />
             </div>
@@ -890,7 +912,7 @@ export default function StudentProfile() {
                 name="schoolBackground"
                 value={editableData.schoolBackground}
                 onChange={handleEditChange}
-                readOnly={!editMode}
+                readOnly={!editMode || !isEditable}
                 className="border-blue-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-gray-500 text-gray-900 dark:text-gray-100"
               />
             </div>
@@ -937,7 +959,7 @@ export default function StudentProfile() {
                 name="contactPersonFirstNameAMH"
                 value={editableData.contactPersonFirstNameAMH}
                 onChange={handleEditChange}
-                readOnly={!editMode}
+                readOnly={!editMode || !isEditable}
                 className="border-blue-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-gray-500 text-gray-900 dark:text-gray-100"
               />
             </div>
@@ -953,7 +975,7 @@ export default function StudentProfile() {
                 name="contactPersonFirstNameENG"
                 value={editableData.contactPersonFirstNameENG}
                 onChange={handleEditChange}
-                readOnly={!editMode}
+                readOnly={!editMode || !isEditable}
                 className="border-blue-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-gray-500 text-gray-900 dark:text-gray-100"
               />
             </div>
@@ -972,7 +994,7 @@ export default function StudentProfile() {
                 name="contactPersonLastNameAMH"
                 value={editableData.contactPersonLastNameAMH}
                 onChange={handleEditChange}
-                readOnly={!editMode}
+                readOnly={!editMode || !isEditable}
                 className="border-blue-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-gray-500 text-gray-900 dark:text-gray-100"
               />
             </div>
@@ -988,7 +1010,7 @@ export default function StudentProfile() {
                 name="contactPersonLastNameENG"
                 value={editableData.contactPersonLastNameENG}
                 onChange={handleEditChange}
-                readOnly={!editMode}
+                readOnly={!editMode || !isEditable}
                 className="border-blue-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-gray-500 text-gray-900 dark:text-gray-100"
               />
             </div>
@@ -1007,7 +1029,7 @@ export default function StudentProfile() {
                 name="contactPersonPhoneNumber"
                 value={editableData.contactPersonPhoneNumber}
                 onChange={handleEditChange}
-                readOnly={!editMode}
+                readOnly={!editMode || !isEditable}
                 className="border-blue-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-gray-500 text-gray-900 dark:text-gray-100"
               />
             </div>
@@ -1023,7 +1045,7 @@ export default function StudentProfile() {
                 name="contactPersonRelation"
                 value={editableData.contactPersonRelation}
                 onChange={handleEditChange}
-                readOnly={!editMode}
+                readOnly={!editMode || !isEditable}
                 className="border-blue-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-gray-500 text-gray-900 dark:text-gray-100"
               />
             </div>
@@ -1031,87 +1053,91 @@ export default function StudentProfile() {
         </CardContent>
       </Card>
 
-      <Button
-        onClick={() => setPasswordForm(!passwordForm)}
-        className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white"
-      >
-        {passwordForm ? "Cancel" : "Change Password"}
-      </Button>
-      <motion.div
-        initial={{ height: 0, opacity: 0 }}
-        animate={{
-          height: passwordForm ? "auto" : 0,
-          opacity: passwordForm ? 1 : 0,
-        }}
-        transition={{ duration: 0.3 }}
-        className="overflow-hidden"
-      >
-        <Card className="bg-white dark:bg-gray-800 border-blue-200 dark:border-gray-700">
-          <CardHeader>
-            <CardTitle className="text-blue-600 dark:text-gray-100">
-              Change Password
-            </CardTitle>
-            <CardDescription className="text-gray-600 dark:text-gray-400">
-              Update the student's password
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="newPassword"
-                    className="text-gray-700 dark:text-gray-300"
-                  >
-                    New Password
-                  </Label>
-                  <Input
-                    type="password"
-                    id="newPassword"
-                    name="newPassword"
-                    value={formData.newPassword}
-                    onChange={handleChange}
-                    required
-                    minLength={8}
-                    placeholder="Enter new password"
-                    className="border-blue-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-gray-500 text-gray-900 dark:text-gray-100"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="confirmPassword"
-                    className="text-gray-700 dark:text-gray-300"
-                  >
-                    Confirm Password
-                  </Label>
-                  <Input
-                    type="password"
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    required
-                    minLength={8}
-                    placeholder="Confirm new password"
-                    className="border-blue-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-gray-500 text-gray-900 dark:text-gray-100"
-                  />
-                </div>
-              </div>
-              {error && (
-                <p className="text-red-500 dark:text-red-400 text-sm">
-                  {error}
-                </p>
-              )}
-              <Button
-                type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white"
-              >
+      {isEditable && (
+        <Button
+          onClick={() => setPasswordForm(!passwordForm)}
+          className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white"
+        >
+          {passwordForm ? "Cancel" : "Change Password"}
+        </Button>
+      )}
+      {isEditable && (
+        <motion.div
+          initial={{ height: 0, opacity: 0 }}
+          animate={{
+            height: passwordForm ? "auto" : 0,
+            opacity: passwordForm ? 1 : 0,
+          }}
+          transition={{ duration: 0.3 }}
+          className="overflow-hidden"
+        >
+          <Card className="bg-white dark:bg-gray-800 border-blue-200 dark:border-gray-700">
+            <CardHeader>
+              <CardTitle className="text-blue-600 dark:text-gray-100">
                 Change Password
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-      </motion.div>
+              </CardTitle>
+              <CardDescription className="text-gray-600 dark:text-gray-400">
+                Update the student's password
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="newPassword"
+                      className="text-gray-700 dark:text-gray-300"
+                    >
+                      New Password
+                    </Label>
+                    <Input
+                      type="password"
+                      id="newPassword"
+                      name="newPassword"
+                      value={formData.newPassword}
+                      onChange={handleChange}
+                      required
+                      minLength={8}
+                      placeholder="Enter new password"
+                      className="border-blue-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-gray-500 text-gray-900 dark:text-gray-100"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="confirmPassword"
+                      className="text-gray-700 dark:text-gray-300"
+                    >
+                      Confirm Password
+                    </Label>
+                    <Input
+                      type="password"
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      required
+                      minLength={8}
+                      placeholder="Confirm new password"
+                      className="border-blue-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-gray-500 text-gray-900 dark:text-gray-100"
+                    />
+                  </div>
+                </div>
+                {error && (
+                  <p className="text-red-500 dark:text-red-400 text-sm">
+                    {error}
+                  </p>
+                )}
+                <Button
+                  type="submit"
+                  className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white"
+                >
+                  Change Password
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
 
       <div className="max-w-7xl mx-auto p-4 sm:p-6 bg-white dark:bg-gray-800 border border-blue-200 dark:border-gray-700 rounded-lg shadow-md">
         <CardHeader>

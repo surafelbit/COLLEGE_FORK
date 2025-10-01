@@ -5,11 +5,17 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import {
   GraduationCap,
+  User,
   LayoutDashboard,
   BarChart3,
   Settings,
+  Users,
   LogOut,
+  Star,
+  Layers,
   Menu,
+  StarHalf,
+  CircleStar,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -18,9 +24,36 @@ export default function ManagerLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const navigation = [
-    { name: "Dashboard", href: "/manager/dashboard", icon: LayoutDashboard },
-    { name: "Reports", href: "/manager/reports", icon: BarChart3 },
-    { name: "Settings", href: "/manager/settings", icon: Settings },
+    {
+      name: "Dashboard",
+      href: "/general-manager/dashboard",
+      icon: LayoutDashboard,
+    },
+    {
+      name: "Students",
+      href: "/general-manager/students",
+      icon: Users,
+    },
+    {
+      name: "Teachers",
+      href: "/general-manager/teachers",
+      icon: Users,
+    },
+    { name: "Dean", href: "/general-manager/dean", icon: Star },
+    { name: "ViceDean", href: "/general-manager/vice-dean", icon: CircleStar },
+    {
+      name: "Registrar",
+      href: "/general-manager/registrar",
+      icon: User,
+    },
+    {
+      name: "Department",
+      href: "/general-manager/department",
+      icon: Layers,
+    },
+
+    { name: "Reports", href: "/general-manager/reports", icon: BarChart3 },
+    { name: "Settings", href: "/general-manager/settings", icon: Settings },
   ];
 
   useEffect(() => {

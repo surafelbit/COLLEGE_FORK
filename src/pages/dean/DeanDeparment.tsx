@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import apiService from "@/components/api/apiService";
 import endPoints from "@/components/api/endPoints";
-
+import { useLocation } from "react-router-dom";
 interface Department {
   dptID: number;
   deptName: string;
@@ -51,7 +51,7 @@ const fakeDepartments: Department[] = [
 export default function DeanDepartments() {
   const [departments, setDepartments] = useState<Department[]>([]);
   const navigate = useNavigate();
-
+  const location = useLocation();
   useEffect(() => {
     // For now: load fake data
     setDepartments(fakeDepartments);
@@ -88,7 +88,15 @@ export default function DeanDepartments() {
             key={dept.dptID}
             onClick={() =>
               // navigate(`/vice-dean/departments/${dept.departmentCode}`)
-              navigate(`/dean/departments/math`)
+              {
+                if (location.pathname.includes("general-manager")) {
+                  {
+                    navigate("/general-manager/departments/math");
+                  }
+                } else {
+                  navigate("/dean/departments/math");
+                }
+              }
             }
             className={`cursor-pointer h-62 rounded-3xl p-6 shadow-xl bg-gradient-to-r from-blue-500 to-blue-800 text-white flex flex-col justify-between transform hover:-translate-y-2 hover:shadow-2xl transition`}
           >
