@@ -58,6 +58,10 @@ export default function RegistrarLayout() {
     { name: "Customize Tables", href: "/registrar/tables", icon: Calendar },
     // { name: "Setting", href: "/registrar/settings", icon: Settings },
   ];
+  function logout() {
+    localStorage.removeItem("xy9a7b");
+    navigate("/");
+  }
   const [extra, setExtra] = useState(false);
   const [setupOpen, setSetupOpen] = useState(false);
 
@@ -400,6 +404,7 @@ export default function RegistrarLayout() {
         {/* Footer Sign Out */}
         <div className="bg-white dark:bg-gray-800 absolute bottom-0 w-full p-4 border-t border-gray-200 dark:border-gray-700">
           <Button
+            onClick={logout}
             variant="ghost"
             className="w-full justify-start text-gray-600 dark:text-gray-300"
           >
@@ -454,7 +459,7 @@ export default function RegistrarLayout() {
                   <div className="text-xs text-gray-500 dark:text-gray-400">
                     Academic Records
                   </div>
-                  <Button>Logout</Button>
+                  <Button onClick={logout}>Logout</Button>
                 </div>
               )}
               {listOpen && (
@@ -469,7 +474,10 @@ export default function RegistrarLayout() {
                   </div>
                   <Button
                     className="w-full"
-                    onClick={() => console.log("Logout")}
+                    onClick={() => {
+                      console.log("Logout");
+                      logout();
+                    }}
                   >
                     Logout
                   </Button>

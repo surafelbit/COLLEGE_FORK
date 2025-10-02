@@ -2,6 +2,8 @@
 
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import {
@@ -20,6 +22,8 @@ import { studentApi } from "@/lib/api";
 import type { Student } from "@/mocks/mockStudent";
 
 export default function StudentLayout() {
+  const navigate = useNavigate();
+
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(() => {
     // Initial check: if large screen (≥ 1024px), open sidebar
@@ -65,6 +69,10 @@ export default function StudentLayout() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, [sidebarOpen]);
+  function logout() {
+    localStorage.removeItem("xy9a7b");
+    navigate("/");
+  }
   const navigation = [
     { name: t("dashboard"), href: "/student/dashboard", icon: LayoutDashboard },
     { name: t("profile"), href: "/student/profile", icon: User },
@@ -162,6 +170,7 @@ export default function StudentLayout() {
 
         <div className="absolute bottom-0 w-full p-4">
           <Button
+            onClick={logout}
             variant="ghost"
             className="w-full justify-start text-gray-600 dark:text-gray-300"
           >
@@ -219,7 +228,7 @@ export default function StudentLayout() {
                     Academic Records
                   </div>
                 </div>
-                <Button>Logout</Button>
+                <Button onClick={logout}>Logout</Button>
               </div>
             )}
 
@@ -236,7 +245,10 @@ export default function StudentLayout() {
                 </div>
                 <Button
                   className="w-full"
-                  onClick={() => console.log("Logout")}
+                  onClick={() => {
+                    console.log("Logout");
+                    logout();
+                  }}
                 >
                   Logout
                 </Button>

@@ -1,6 +1,9 @@
 import axios from "axios";
 const apiClient = axios.create({
-  baseURL: "https://growing-crayfish-firstly.ngrok-free.app/api",
+  baseURL:
+    "https://deutschemedizin-collage-backend-production.up.railway.app/api",
+
+  // baseURL: "https://growing-crayfish-firstly.ngrok-free.app/api",
   headers: {
     // Global header to bypass Ngrok browser warning which can cause 403
     "ngrok-skip-browser-warning": "true",

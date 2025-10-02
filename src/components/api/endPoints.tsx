@@ -25,6 +25,9 @@ const endPoints = {
   batches: "/batches",
   courses: "/courses/single",
   regions: "/region",
+  allWoreda: "/woreda",
+  allZones: "/zone",
+  allRegion: "/region",
   zonesByRegion: "/zone/region",
   woredasByZone: "/woreda/zone",
   notifications: "/notifications/me", // GET
