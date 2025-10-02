@@ -1,14 +1,64 @@
 import React, { useState, useEffect } from "react";
 import { FaEdit, FaTrash, FaPlus, FaList, FaTh } from "react-icons/fa";
-
+import { Loader2 } from "lucide-react";
+import apiService from "@/components/api/apiService";
+import endPoints from "@/components/api/endPoints";
 const RegistrarAdminPage = () => {
+  const [backendRegions, setBackendRegions] = useState([]);
+  const [backendWoredas, setBackendWoredas] = useState([]);
+  const [backendZones, setBackendZones] = useState([]);
+  const [regions, setRegions] = useState([]);
+  const [woredas, setWoredas] = useState([]);
+  const [zones, setZones] = useState([]);
+  const [loading, setLoading] = useState(true); // <-- spinner state
+
+  useEffect(() => {
+    const getter = async () => {
+      try {
+        const zoneData = await apiService.get(endPoints.allZones);
+        const regionsData = await apiService.get(endPoints.allRegion);
+        const woredaData = await apiService.get(endPoints.allWoreda);
+        setBackendWoredas(woredaData);
+        setBackendRegions(regionsData);
+        setBackendZones(zoneData);
+        const transformedRegions = regionsData.map((region) => ({
+          code: region.regionCode,
+          name: region.region,
+          countryCode: region.regionType, // or region.countryCode if backend provides it differently
+        }));
+        const transformedWoredas = woredaData.map((woreda) => ({
+          code: woreda.woredaCode,
+          name: woreda.woreda,
+          zoneCode: woreda.zoneCode,
+        }));
+        const transformedZones = zoneData.map((zone) => ({
+          code: zone.zoneCode,
+          name: zone.zone,
+          regionCode: zone.regionCode,
+        }));
+        setZones(transformedZones);
+        setWoredas(transformedWoredas);
+        setRegions(transformedRegions); // Update regions state
+        console.log("Fetched regions:", regionsData);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false); // stop spinner
+      }
+    };
+    getter();
+  }, []);
   // Fake initial data
   const initialCountries = [
     { code: "ET", name: "Ethiopia" },
     { code: "KE", name: "Kenya" },
   ];
-
-  const initialRegions = [
+  const initialRegions = backendRegions.map((region) => ({
+    code: region.regionCode,
+    name: region.region,
+    countryCode: region.regionType, // or region.countryCode if backend provides it differently
+  }));
+  const initialRegionss = [
     { code: "AM", name: "Amhara", countryCode: "ET" },
     { code: "OR", name: "Oromia", countryCode: "ET" },
     { code: "NA", name: "Nairobi Region", countryCode: "KE" },
@@ -27,9 +77,9 @@ const RegistrarAdminPage = () => {
   }));
 
   const [countries, setCountries] = useState(initialCountries);
-  const [regions, setRegions] = useState(initialRegions);
-  const [zones, setZones] = useState(initialZones);
-  const [woredas, setWoredas] = useState(initialWoredas);
+  // const [regions, setRegions] = useState(initialRegions);
+  // const [zones, setZones] = useState(initialZones);
+  // const [woredas, setWoredas] = useState(initialWoredas);
   const [selectedSection, setSelectedSection] = useState("countries");
 
   const sections = [
@@ -109,6 +159,7 @@ const RegistrarAdminPage = () => {
           (section) =>
             selectedSection === section.id && (
               <CrudSection
+                anotherInfo={loading}
                 key={section.id}
                 title={section.title}
                 {...section}
@@ -122,6 +173,7 @@ const RegistrarAdminPage = () => {
 
 const CrudSection = ({
   title,
+  anotherInfo,
   data,
   setData,
   parentList,
@@ -305,38 +357,51 @@ const CrudSection = ({
                 </th>
               </tr>
             </thead>
-            <tbody>
-              {paginatedData.map((item) => (
-                <tr
-                  key={item.code}
-                  className="group transition-colors duration-200 hover:bg-gray-200 dark:hover:bg-gray-700 animate-slide-up"
-                >
-                  <td className="p-4">{item.code}</td>
-                  <td className="p-4">{item.name}</td>
-                  {getParentName && (
-                    <td className="p-4">
-                      {getParentName(item[parentForeignKey])}
+            {!anotherInfo && (
+              <tbody>
+                {paginatedData.map((item) => (
+                  <tr
+                    key={item.code}
+                    className="group transition-colors duration-200 hover:bg-gray-200 dark:hover:bg-gray-700 animate-slide-up"
+                  >
+                    <td className="p-4">{item.code}</td>
+                    <td className="p-4">{item.name}</td>
+                    {getParentName && (
+                      <td className="p-4">
+                        {getParentName(item[parentForeignKey])}
+                      </td>
+                    )}
+                    <td className="p-4 text-right">
+                      <div className="flex justify-end gap-3 ">
+                        <button
+                          onClick={() => handleOpenModal(item)}
+                          className="p-2 rounded-full transform hover:scale-110 transition-all duration-200 text-yellow-500 dark:text-yellow-400 hover:bg-yellow-600/50 dark:hover:bg-yellow-800/50"
+                        >
+                          <FaEdit className="text-lg" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(item.code)}
+                          className="p-2 rounded-full transform hover:scale-110 transition-all duration-200 text-red-500 dark:text-red-400 hover:bg-red-600/50 dark:hover:bg-red-800/50"
+                        >
+                          <FaTrash className="text-lg" />
+                        </button>
+                      </div>
                     </td>
-                  )}
-                  <td className="p-4 text-right">
-                    <div className="flex justify-end gap-3 ">
-                      <button
-                        onClick={() => handleOpenModal(item)}
-                        className="p-2 rounded-full transform hover:scale-110 transition-all duration-200 text-yellow-500 dark:text-yellow-400 hover:bg-yellow-600/50 dark:hover:bg-yellow-800/50"
-                      >
-                        <FaEdit className="text-lg" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(item.code)}
-                        className="p-2 rounded-full transform hover:scale-110 transition-all duration-200 text-red-500 dark:text-red-400 hover:bg-red-600/50 dark:hover:bg-red-800/50"
-                      >
-                        <FaTrash className="text-lg" />
-                      </button>
+                  </tr>
+                ))}
+              </tbody>
+            )}
+            {anotherInfo && (
+              <tbody>
+                <tr>
+                  <td colSpan="4" className="p-4">
+                    <div className="flex items-center justify-center h-20 ">
+                      <Loader2 className="h-10 w-10 animate-spin text-blue-600 dark:text-blue-400" />
                     </div>
                   </td>
                 </tr>
-              ))}
-            </tbody>
+              </tbody>
+            )}
           </table>
         </div>
       ) : (

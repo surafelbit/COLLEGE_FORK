@@ -14,8 +14,11 @@ import {
   Layers,
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function ViceDeanLayout() {
+  const navigate = useNavigate();
+
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [listOpen, setListOpen] = useState(() => {
@@ -41,6 +44,10 @@ export default function ViceDeanLayout() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, [sidebarOpen]);
+  function logout() {
+    localStorage.removeItem("xy9a7b");
+    navigate("/");
+  }
   return (
     <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Mobile sidebar backdrop */}
@@ -117,6 +124,7 @@ export default function ViceDeanLayout() {
 
         <div className="absolute bottom-0 w-full p-4">
           <Button
+            onClick={logout}
             variant="ghost"
             className="w-full justify-start text-gray-600 dark:text-gray-300"
           >
@@ -168,7 +176,7 @@ export default function ViceDeanLayout() {
                     <div className="text-xs text-gray-500 dark:text-gray-400">
                       Academic Leadership
                     </div>
-                    <Button>Logout</Button>
+                    <Button onClick={logout}>Logout</Button>
                   </div>
                 )}
                 {listOpen && (
@@ -183,7 +191,10 @@ export default function ViceDeanLayout() {
                     </div>
                     <Button
                       className="w-full"
-                      onClick={() => console.log("Logout")}
+                      onClick={() => {
+                        console.log("Logout");
+                        logout();
+                      }}
                     >
                       Logout
                     </Button>

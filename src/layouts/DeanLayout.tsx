@@ -1,6 +1,6 @@
 "use client";
-
-import { Outlet, Link, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { Outlet, Link, useLocation, redirect } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import {
@@ -16,6 +16,7 @@ import {
 import { useState, useEffect } from "react";
 
 export default function DeanLayout() {
+  const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [listOpen, setListOpen] = useState(() => {
@@ -41,6 +42,10 @@ export default function DeanLayout() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, [sidebarOpen]);
+  function logout() {
+    localStorage.removeItem("xy9a7b");
+    navigate("/");
+  }
   return (
     <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Mobile sidebar backdrop */}
@@ -118,6 +123,7 @@ export default function DeanLayout() {
         <div className="absolute bottom-0 w-full p-4">
           <Button
             variant="ghost"
+            onClick={logout}
             className="w-full justify-start text-gray-600 dark:text-gray-300"
           >
             <LogOut className="mr-3 h-5 w-5" />
@@ -168,7 +174,7 @@ export default function DeanLayout() {
                     <div className="text-xs text-gray-500 dark:text-gray-400">
                       Academic Leadership
                     </div>
-                    <Button>Logout</Button>
+                    <Button onClick={logout}>Logout</Button>
                   </div>
                 )}
                 {listOpen && (
@@ -183,7 +189,10 @@ export default function DeanLayout() {
                     </div>
                     <Button
                       className="w-full"
-                      onClick={() => console.log("Logout")}
+                      onClick={() => {
+                        console.log("Logout");
+                        logout();
+                      }}
                     >
                       Logout
                     </Button>

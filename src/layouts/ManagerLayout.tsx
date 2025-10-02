@@ -1,5 +1,5 @@
 "use client";
-
+import { useNavigate } from "react-router-dom";
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -20,6 +20,11 @@ import {
 import { useState, useEffect } from "react";
 
 export default function ManagerLayout() {
+  function logout() {
+    localStorage.removeItem("xy9a7b");
+    navigate("/");
+  }
+  const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(() => {
     // Initial check: if large screen (≥ 1024px), open sidebar
@@ -152,6 +157,7 @@ export default function ManagerLayout() {
 
         <div className="absolute bottom-0 w-full p-4">
           <Button
+            onClick={logout}
             variant="ghost"
             className="w-full justify-start text-gray-600 dark:text-gray-300"
           >
@@ -203,7 +209,7 @@ export default function ManagerLayout() {
                     <div className="text-xs text-gray-500 dark:text-gray-400">
                       Academic Leadership
                     </div>
-                    <Button>Logout</Button>
+                    <Button onClick={logout}>Logout</Button>
                   </div>
                 )}
                 {listOpen && (

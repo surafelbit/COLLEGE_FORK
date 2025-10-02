@@ -1279,7 +1279,7 @@ const EducationalInformationStep = ({ formData, setFormData, dropdowns }) => {
             Select Class Year *
           </label>
           <div className="relative">
-            <select
+            {/* <select
               name="classYearId"
               value={formData.classYearId}
               onChange={handleInputChange}
@@ -1291,7 +1291,7 @@ const EducationalInformationStep = ({ formData, setFormData, dropdowns }) => {
                   {opt.label}
                 </option>
               ))}
-            </select>
+            </select> */}
 
             {/* Dropdown arrow */}
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-100">
@@ -1857,7 +1857,7 @@ const MultiStepRegistrationForm = () => {
           departmentEnrolledId: "",
           programModalityCode: "",
           schoolBackgroundId: "",
-          classYearId: "",
+          // classYearId: "",
           semesterCode: "",
 
           // Geographic codes
@@ -1916,7 +1916,7 @@ const MultiStepRegistrationForm = () => {
     semesters: [],
     schoolBackgrounds: [],
     programModalities: [],
-    classYears: [],
+    // classYears: [],
     regions: [],
     birthZones: [],
     birthWoredas: [],
@@ -1933,16 +1933,28 @@ const MultiStepRegistrationForm = () => {
           semesters,
           schoolBackgrounds,
           programModalities,
-          classYears,
+          // classYears,
           regions,
         ] = await Promise.all([
-          apiService.get(endPoints.departments),
-          apiService.get(endPoints.impairments),
-          apiService.get(endPoints.semesters),
-          apiService.get(endPoints.schoolBackgrounds),
-          apiService.get(endPoints.programModality),
-          apiService.get(endPoints.classYears),
-          apiService.get(endPoints.regions),
+          apiService.get(endPoints.departments, {
+            headers: { requiresAuth: false },
+          }),
+          apiService.get(endPoints.impairments, {
+            headers: { requiresAuth: false },
+          }),
+          apiService.get(endPoints.semesters, {
+            headers: { requiresAuth: false },
+          }),
+          apiService.get(endPoints.schoolBackgrounds, {
+            headers: { requiresAuth: false },
+          }),
+          apiService.get(endPoints.programModality, {
+            headers: { requiresAuth: false },
+          }),
+          apiService.get(endPoints.regions, {
+            headers: { requiresAuth: false },
+          }),
+          // apiService.get(endPoints.classYears),
         ]);
 
         setDropdowns((prev) => ({
@@ -1967,15 +1979,16 @@ const MultiStepRegistrationForm = () => {
             value: m.modalityCode,
             label: m.modality,
           })),
-          classYears: (classYears || []).map((y) => ({
-            value: y.id,
-            label: y.classYear,
-          })),
+          // classYears: (classYears || []).map((y) => ({
+          //   value: y.id,
+          //   label: y.classYear,
+          // })),
           regions: (regions || []).map((r) => ({
             value: r.regionCode,
             label: r.region,
           })),
         }));
+        console.log(regions, "this are the regionssssss");
       } catch (err) {
         setDropdowns((prev) => ({
           ...prev,
@@ -1984,9 +1997,11 @@ const MultiStepRegistrationForm = () => {
           semesters: [],
           schoolBackgrounds: [],
           programModalities: [],
-          classYears: [],
+          // classYears: [],
           regions: [],
         }));
+        console.log(err);
+        console.log("it reached here");
       }
     };
     loadDropdowns();
@@ -2120,7 +2135,7 @@ const MultiStepRegistrationForm = () => {
       contactPersonRelation: nullIfEmpty(formData.contactPersonRelation),
       departmentEnrolledId: intOrNull(formData.departmentEnrolledId),
       programModalityCode: nullIfEmpty(formData.programModalityCode),
-      classYearId: intOrNull(formData.classYearId),
+      // classYearId: intOrNull(formData.classYearId),
       semesterCode: nullIfEmpty(formData.semesterCode),
     };
     // Remove null fields to avoid backend complaints for missing/optional values
