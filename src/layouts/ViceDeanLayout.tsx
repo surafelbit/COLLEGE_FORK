@@ -18,7 +18,9 @@ import { useState, useEffect } from "react";
 export default function ViceDeanLayout() {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
-
+  const [listOpen, setListOpen] = useState(() => {
+    return window.innerWidth >= 1024;
+  });
   const navigation = [
     { name: "Dashboard", href: "/vice-dean/dashboard", icon: LayoutDashboard },
     { name: "Students", href: "/vice-dean/students", icon: Users },
@@ -144,23 +146,49 @@ export default function ViceDeanLayout() {
           <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
             <div className="flex flex-1 items-center">
               <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Dean Portal
+                Vice Dean Portal
               </h1>
             </div>
             <div className="flex items-center gap-x-4 lg:gap-x-6">
               <ThemeToggle />
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm font-medium">DN</span>
-                </div>
-                <div className="hidden sm:block">
-                  <div className="text-sm font-medium text-gray-900 dark:text-white">
-                    Dean
+                {window.innerWidth < 720 && (
+                  <div
+                    className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center"
+                    onClick={() => setListOpen((prev) => !prev)}
+                  >
+                    <span className="text-white text-sm font-medium">DN</span>
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">
-                    Academic Leadership
+                )}
+                {window.innerWidth > 720 && (
+                  <div className="lg:flex items-center gap-x-4 ml-2">
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">
+                      Vice Dean
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      Academic Leadership
+                    </div>
+                    <Button>Logout</Button>
                   </div>
-                </div>
+                )}
+                {listOpen && (
+                  <div className="absolute top-12 right-0 lg:hidden w-48 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-3 z-50">
+                    <div className="mb-2">
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">
+                        Vice Dean
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        Academic Leadership
+                      </div>
+                    </div>
+                    <Button
+                      className="w-full"
+                      onClick={() => console.log("Logout")}
+                    >
+                      Logout
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           </div>

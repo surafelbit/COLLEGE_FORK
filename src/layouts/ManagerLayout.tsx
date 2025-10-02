@@ -21,8 +21,13 @@ import { useState, useEffect } from "react";
 
 export default function ManagerLayout() {
   const location = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    // Initial check: if large screen (≥ 1024px), open sidebar
+    return window.innerWidth >= 1024;
+  });
+  const [listOpen, setListOpen] = useState(() => {
+    return window.innerWidth >= 1024;
+  });
   const navigation = [
     {
       name: "Dashboard",
@@ -81,9 +86,11 @@ export default function ManagerLayout() {
 
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 shadow-lg transform ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } transition-transform duration-300 ease-in-out `}
+        className={`fixed flex flex-col inset-y-0 left-0 z-50 w-64
+              bg-white dark:bg-gray-800 shadow-xl
+              transform transition-transform duration-300 ease-in-out
+              border-r border-gray-200 dark:border-gray-700
+              ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
         <div className="flex items-center justify-between h-16 px-4 bg-blue-600 shadow-md">
           <div className="flex items-center space-x-3">
@@ -174,23 +181,49 @@ export default function ManagerLayout() {
           <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
             <div className="flex flex-1 items-center">
               <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Manager Portal
+                Dean Portal
               </h1>
             </div>
             <div className="flex items-center gap-x-4 lg:gap-x-6">
               <ThemeToggle />
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm font-medium">GM</span>
-                </div>
-                <div className="hidden sm:block">
-                  <div className="text-sm font-medium text-gray-900 dark:text-white">
-                    General Manager
+                {window.innerWidth < 720 && (
+                  <div
+                    className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center"
+                    onClick={() => setListOpen((prev) => !prev)}
+                  >
+                    <span className="text-white text-sm font-medium">DN</span>
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">
-                    System Administration
+                )}
+                {window.innerWidth > 720 && (
+                  <div className="lg:flex items-center gap-x-4 ml-2">
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">
+                      Dean
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      Academic Leadership
+                    </div>
+                    <Button>Logout</Button>
                   </div>
-                </div>
+                )}
+                {listOpen && (
+                  <div className="absolute top-12 right-0 lg:hidden w-48 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-3 z-50">
+                    <div className="mb-2">
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">
+                        Student
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        Academic Records
+                      </div>
+                    </div>
+                    <Button
+                      className="w-full"
+                      onClick={() => console.log("Logout")}
+                    >
+                      Logout
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
