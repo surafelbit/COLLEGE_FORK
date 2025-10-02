@@ -1936,24 +1936,42 @@ const MultiStepRegistrationForm = () => {
           // classYears,
           regions,
         ] = await Promise.all([
-          apiService.get(endPoints.departments, {
-            headers: { requiresAuth: false },
-          }),
-          apiService.get(endPoints.impairments, {
-            headers: { requiresAuth: false },
-          }),
-          apiService.get(endPoints.semesters, {
-            headers: { requiresAuth: false },
-          }),
-          apiService.get(endPoints.schoolBackgrounds, {
-            headers: { requiresAuth: false },
-          }),
-          apiService.get(endPoints.programModality, {
-            headers: { requiresAuth: false },
-          }),
-          apiService.get(endPoints.regions, {
-            headers: { requiresAuth: false },
-          }),
+          apiService.get(
+            endPoints.departments
+            //   {
+            //   headers: { requiresAuth: false },
+            // }
+          ),
+          apiService.get(
+            endPoints.impairments
+            //   {
+            //   headers: { requiresAuth: false },
+            // }
+          ),
+          apiService.get(
+            endPoints.semesters
+            //    {
+            //   headers: { requiresAuth: false },
+            // }
+          ),
+          apiService.get(
+            endPoints.schoolBackgrounds
+            //   {
+            //   headers: { requiresAuth: false },
+            // }
+          ),
+          apiService.get(
+            endPoints.programModality
+            //   {
+            //   headers: { requiresAuth: false },
+            // }
+          ),
+          apiService.get(
+            endPoints.regions
+            //    {
+            //   headers: { requiresAuth: false },
+            // }
+          ),
           // apiService.get(endPoints.classYears),
         ]);
 
