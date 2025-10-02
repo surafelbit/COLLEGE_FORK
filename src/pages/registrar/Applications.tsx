@@ -31,9 +31,9 @@ export default function RegistrarApplications() {
             key: String(a.id),
             name: englishName || "-",
             amharicName: amharicName || "-",
-            year: Number(a.classYearId) || 0,
-            semester: a.semesterCode || a.academicPeriodCode || undefined,
-            department: String(a.departmentEnrolledId || "-"),
+            year: a.classYearName || "-",
+            semester: a.semesterName || "-",
+            department: a.departmentEnrolledName || "-",
             gender: a.gender || "",
             photo: "",
           } as ApplicantRow;
