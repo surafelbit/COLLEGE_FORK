@@ -440,17 +440,11 @@ export default function RegistrarLayout() {
             </div>
 
             {/* Right side controls */}
-            <div className="flex items-center gap-x-4 lg:gap-x-6">
-              <ThemeToggle /              
-              {/* Notification Dropdown */}
-              <NotificationDropdown />
-
-              {/* User info */}
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm font-medium">RG</span>
-                </div>
-              )}
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                <span className="text-white text-sm font-medium">RG</span>
+              </div>
+              {/* Remove the erroneous ) here */}
               {window.innerWidth > 720 && (
                 <div className="lg:flex items-center gap-x-4 ml-2 ">
                   <div className="text-sm font-medium text-gray-900 dark:text-white">
