@@ -1279,7 +1279,7 @@ const EducationalInformationStep = ({ formData, setFormData, dropdowns }) => {
             Select Class Year *
           </label>
           <div className="relative">
-            {/* <select
+            <select
               name="classYearId"
               value={formData.classYearId}
               onChange={handleInputChange}
@@ -1291,7 +1291,7 @@ const EducationalInformationStep = ({ formData, setFormData, dropdowns }) => {
                   {opt.label}
                 </option>
               ))}
-            </select> */}
+            </select>
 
             {/* Dropdown arrow */}
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-100">
@@ -1857,7 +1857,7 @@ const MultiStepRegistrationForm = () => {
           departmentEnrolledId: "",
           programModalityCode: "",
           schoolBackgroundId: "",
-          // classYearId: "",
+          classYearId: "",
           semesterCode: "",
 
           // Geographic codes
@@ -1916,7 +1916,7 @@ const MultiStepRegistrationForm = () => {
     semesters: [],
     schoolBackgrounds: [],
     programModalities: [],
-    // classYears: [],
+    classYears: [],
     regions: [],
     birthZones: [],
     birthWoredas: [],
@@ -1933,8 +1933,8 @@ const MultiStepRegistrationForm = () => {
           semesters,
           schoolBackgrounds,
           programModalities,
-          // classYears,
           regions,
+          classYears,
         ] = await Promise.all([
           apiService.get(
             endPoints.departments
@@ -1972,7 +1972,7 @@ const MultiStepRegistrationForm = () => {
             //   headers: { requiresAuth: false },
             // }
           ),
-          // apiService.get(endPoints.classYears),
+          apiService.get(endPoints.classYears),
         ]);
 
         setDropdowns((prev) => ({
@@ -1997,10 +1997,10 @@ const MultiStepRegistrationForm = () => {
             value: m.modalityCode,
             label: m.modality,
           })),
-          // classYears: (classYears || []).map((y) => ({
-          //   value: y.id,
-          //   label: y.classYear,
-          // })),
+          classYears: (classYears || []).map((y) => ({
+            value: y.id,
+            label: y.classYear,
+          })),
           regions: (regions || []).map((r) => ({
             value: r.regionCode,
             label: r.region,
@@ -2015,7 +2015,7 @@ const MultiStepRegistrationForm = () => {
           semesters: [],
           schoolBackgrounds: [],
           programModalities: [],
-          // classYears: [],
+          classYears: [],
           regions: [],
         }));
         console.log(err);
@@ -2153,7 +2153,7 @@ const MultiStepRegistrationForm = () => {
       contactPersonRelation: nullIfEmpty(formData.contactPersonRelation),
       departmentEnrolledId: intOrNull(formData.departmentEnrolledId),
       programModalityCode: nullIfEmpty(formData.programModalityCode),
-      // classYearId: intOrNull(formData.classYearId),
+      classYearId: intOrNull(formData.classYearId),
       semesterCode: nullIfEmpty(formData.semesterCode),
     };
     // Remove null fields to avoid backend complaints for missing/optional values
