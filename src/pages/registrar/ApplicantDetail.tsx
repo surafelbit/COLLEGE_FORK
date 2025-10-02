@@ -583,6 +583,33 @@ export default function ApplicantDetail() {
             </div>
           </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="classYear">Academic Year</Label>
+              <Input
+                id="classYear"
+                value={applicantData.classYearName || "N/A"}
+                readOnly
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="semester">Semester</Label>
+              <Input
+                id="semester"
+                value={applicantData.semesterName || "N/A"}
+                readOnly
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="departmentName">Department</Label>
+              <Input
+                id="departmentName"
+                value={applicantData.departmentEnrolledName || "N/A"}
+                readOnly
+              />
+            </div>
+          </div>
+
           <Separator />
 
           <div className="space-y-2">
