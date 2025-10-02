@@ -8,6 +8,8 @@ const endPoints = {
   applicantPhoto: "/applicants/:id/photo", // GET
   applicantDocument: "/applicants/:id/document", // GET
   students: "/students", // GET
+  studentsDeactivation : "/students/:id/disable" ,
+  studentsActivation : "/students/:id/enable" ,
   createDepartmentHead: "/auth/create-department-head",
   createTeacher: "/auth/create-teacher",
   departmentHeads: "/department-heads",
@@ -25,6 +27,10 @@ const endPoints = {
   regions: "/region",
   zonesByRegion: "/zone/region",
   woredasByZone: "/woreda/zone",
+  notifications: "/notifications/me", // GET
+  notificationsLatest: "/notifications/me/latest", // GET
+  markNotificationRead: "/notifications/:id/read", // PATCH
+  markAllNotificationsRead: "/notifications/me/read-all", // PATCH
 };
 
 export default endPoints;
