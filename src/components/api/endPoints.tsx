@@ -1,7 +1,7 @@
 const endPoints = {
   login: "/auth/login",
   register: "/auth/register",
-  applicantsRegister: "/applicants/", // POST
+  applicantsRegister: "https://deutschemedizin-collage-backend-production.up.railway.app/api/applicants/register", // POST
   applicantsList: "/applicants", // GET
   applicantDetail: "/applicants/:id", // GET
   applicantUpdateStatus: "/applicants/:id/status", // PUT

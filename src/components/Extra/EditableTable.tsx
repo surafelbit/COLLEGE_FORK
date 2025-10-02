@@ -8,6 +8,7 @@ export interface DataTypes {
   key: string;
   name: string;
   year: number;
+  semester?: string | number;
   amharicName: string;
   department: string;
   gender: string;
@@ -72,7 +73,12 @@ const EditableTable: React.FC<EditableTableProps> = ({ initialData }) => {
       render: (_: any, record: DataTypes) =>
         showAmharic ? record.amharicName : record.name,
     },
-    { title: "Year", dataIndex: "year", width: "10%" },
+    {
+      title: "Year / Semester",
+      dataIndex: "year",
+      width: "12%",
+      render: (_: any, record: DataTypes) => `${record.year || '-'} / ${record.semester ?? '-'}`,
+    },
     { title: "Gender", dataIndex: "gender", width: "10%" },
     { title: "Department", dataIndex: "department", width: "25%" },
 
