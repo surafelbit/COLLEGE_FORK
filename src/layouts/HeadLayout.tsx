@@ -3,6 +3,7 @@
 import { Outlet, Link, useLocation } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
+import NotificationDropdown from "@/components/ui/NotificationDropdown"
 import { LayoutDashboard, Users, BookOpen, BarChart3, LogOut, Menu } from "lucide-react"
 import { useEffect, useState } from "react"
 
@@ -108,6 +109,7 @@ export default function HeadLayout() {
             </div>
             <div className="flex items-center gap-x-4 lg:gap-x-6">
               <ThemeToggle />
+              <NotificationDropdown />
               <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
                   <span className="text-white text-sm font-medium">DH</span>

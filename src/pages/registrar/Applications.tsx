@@ -32,6 +32,7 @@ export default function RegistrarApplications() {
             name: englishName || "-",
             amharicName: amharicName || "-",
             year: Number(a.classYearId) || 0,
+            semester: a.semesterCode || a.academicPeriodCode || undefined,
             department: String(a.departmentEnrolledId || "-"),
             gender: a.gender || "",
             photo: "",
