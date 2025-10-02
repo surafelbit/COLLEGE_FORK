@@ -3,6 +3,7 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
+import NotificationDropdown from "@/components/ui/NotificationDropdown";
 import {
   GraduationCap,
   LayoutDashboard,
@@ -56,18 +57,6 @@ export default function RegistrarLayout() {
   ];
   const [extra, setExtra] = useState(false);
   const [setupOpen, setSetupOpen] = useState(false);
-  // Example state
-  const [notifications, setNotifications] = useState([
-    { id: 1, text: "New student registered" },
-    { id: 2, text: "Fee payment confirmed" },
-    { id: 3, text: "Grade report submitted" },
-    { id: 4, text: "New message from Admin" },
-    { id: 5, text: "System maintenance tonight" },
-  ]);
-  const [showNotifications, setShowNotifications] = useState(false);
-
-  // how many to show initially
-  const maxVisible = 3;
 
   return (
     <div className=" flex min-h-screen bg-gray-50 dark:bg-gray-900 ">
@@ -402,37 +391,6 @@ export default function RegistrarLayout() {
                 </div>
               )}
             </div>
-            <div className="mt-2 space-y-1">
-              <button
-                onClick={() => navigate("/registrar/notifications")}
-                className="flex items-center w-full px-4 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
-              >
-                {/* Icon with badge */}
-                <div className="relative mr-2">
-                  <svg
-                    className="w-6 h-6 text-gray-700 dark:text-gray-200"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14V11a6 6 0 10-12 0v3c0 .386-.146.735-.405 1.005L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                    />
-                  </svg>
-                  {/* Red badge */}
-                  <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-red-500 rounded-full">
-                    3
-                  </span>
-                </div>
-
-                {/* Button text */}
-                <span>Notification</span>
-              </button>
-            </div>
           </div>
         </nav>
 
@@ -476,60 +434,9 @@ export default function RegistrarLayout() {
             {/* Right side controls */}
             <div className="flex items-center gap-x-4 lg:gap-x-6">
               <ThemeToggle />
-
-              {/* Notification Bell */}
-              <div className="relative">
-                <div
-                  className="cursor-pointer"
-                  onClick={() => setShowNotifications(!showNotifications)}
-                >
-                  <svg
-                    className="w-6 h-6 text-gray-700 dark:text-gray-200"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14V11a6 6 0 10-12 0v3c0 .386-.146.735-.405 1.005L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                    />
-                  </svg>
-                  {/* Red badge */}
-                  <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-red-500 rounded-full">
-                    {notifications.length}
-                  </span>
-                </div>
-
-                {/* Dropdown Notifications */}
-                {showNotifications && (
-                  <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50">
-                    <div className="py-2">
-                      {/* Show only first N notifications */}
-                      {notifications.slice(0, maxVisible).map((note) => (
-                        <div
-                          key={note.id}
-                          className="px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
-                        >
-                          {note.text}
-                        </div>
-                      ))}
-
-                      {/* If more exist show “View More” */}
-                      {notifications.length > maxVisible && (
-                        <div
-                          onClick={() => alert("Go to full notifications page")}
-                          className="px-4 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer font-medium"
-                        >
-                          View more →
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
+              
+              {/* Notification Dropdown */}
+              <NotificationDropdown />
 
               {/* User info */}
               <div className="flex items-center space-x-2">

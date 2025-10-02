@@ -27,6 +27,10 @@ const endPoints = {
   regions: "/region",
   zonesByRegion: "/zone/region",
   woredasByZone: "/woreda/zone",
+  notifications: "/notifications/me", // GET
+  notificationsLatest: "/notifications/me/latest", // GET
+  markNotificationRead: "/notifications/:id/read", // PATCH
+  markAllNotificationsRead: "/notifications/me/read-all", // PATCH
 };
 
 export default endPoints;
