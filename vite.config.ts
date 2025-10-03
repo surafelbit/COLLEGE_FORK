@@ -7,10 +7,8 @@ import tailwindcss from "@tailwindcss/vite";
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  // server: {
-  //   // allow your ngrok URL
-  //   allowedHosts: ["b23e8369b435.ngrok-free.app"],
-  // },
+  
+  // Development server configuration
   server: {
     host: true, // listen on all interfaces
     port: 5173,
@@ -22,6 +20,25 @@ export default defineConfig({
     headers: {
       "Access-Control-Allow-Origin": "*",
     },
+  },
+
+  // Production build configuration
+  build: {
+    outDir: 'dist',
+    sourcemap: false,
+    minify: 'esbuild',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          router: ['react-router-dom'],
+          ui: ['@radix-ui/react-avatar', '@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
+          charts: ['chart.js', 'react-chartjs-2'],
+          utils: ['axios', 'clsx', 'tailwind-merge']
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1000,
   },
 
   resolve: {
