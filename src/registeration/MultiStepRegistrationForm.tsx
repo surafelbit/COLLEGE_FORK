@@ -925,6 +925,7 @@ const EducationalInformationStep = ({ formData, setFormData, dropdowns }) => {
         title: "High School Graduate Certificate Requirements",
         content: [
           "• 8th Grade Certificate",
+          "• Grade 9-12 Transcript",
           "• 12th Grade National Exam Certificate",
           "• If you have multiple certificates, please combine them into a single PDF file before uploading",
         ],
@@ -939,20 +940,20 @@ const EducationalInformationStep = ({ formData, setFormData, dropdowns }) => {
         ],
       },
       "3": {
-        // College Degree
-        title: "College Degree Certificate Requirements",
-        content: [
-          "• Grade 12 Certificate",
-          "• College Degree Certificate",
-          "• If you have multiple certificates, please combine them into a single PDF file before uploading",
-        ],
-      },
-      "4": {
         // Level IV
         title: "Level IV Certificate Requirements",
         content: [
           "• Grade 12 Certificate",
           "• Level IV Certificate",
+          "• If you have multiple certificates, please combine them into a single PDF file before uploading",
+        ],
+      },
+      "4": {
+        // College Degree
+        title: "College Degree Certificate Requirements",
+        content: [
+          "• Grade 12 Certificate",
+          "• College Degree Certificate",
           "• If you have multiple certificates, please combine them into a single PDF file before uploading",
         ],
       },
@@ -1076,12 +1077,12 @@ const EducationalInformationStep = ({ formData, setFormData, dropdowns }) => {
             />
 
             <h3 className="text-lg font-semibold text-blue-800 mb-2">
-              Please Upload Your Certificate (Optional)
+              Please Upload Your Documenet
             </h3>
             <div className="text-sm font-medium text-gray-600 mb-4 text-center">
               {currentInstructions ? (
                 <div className="flex items-center justify-center gap-2">
-                  <span>Upload your certificates below:</span>
+                  <span>Upload your Documenet below:</span>
                   <button
                     type="button"
                     onClick={() => setShowInstructions(!showInstructions)}
@@ -1146,7 +1147,7 @@ const EducationalInformationStep = ({ formData, setFormData, dropdowns }) => {
                 className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg shadow cursor-pointer hover:from-blue-700 hover:to-blue-800 transition"
               >
                 <ImageIcon className="w-5 h-5" />
-                <span>Upload Certificate</span>
+                <span>Upload Document</span>
               </label>
 
               {/* File name */}
@@ -1982,10 +1983,12 @@ const MultiStepRegistrationForm = () => {
             value: d.dptID,
             label: d.deptName,
           })),
-          impairments: (impairments || []).map((i) => ({
-            value: i.impairmentCode,
-            label: i.impairment,
-          })),
+          impairments: (impairments || [])
+            .map((i) => ({
+              value: i?.impairmentCode ?? i?.disabilityCode,
+              label: i?.impairment ?? i?.disability,
+            }))
+            .filter((opt) => opt.value && opt.label),
           semesters: (semesters || []).map((s) => ({
             value: s.academicPeriodCode,
             label: s.academicPeriod,
