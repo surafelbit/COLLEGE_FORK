@@ -15,11 +15,23 @@ export interface NotificationResponse {
 }
 
 class NotificationService {
+  // Normalize varying backend shapes to our Notification interface
+  private normalizeNotification(item: any): Notification {
+    return {
+      id: item.id,
+      senderRole: item.senderRole,
+      message: item.message,
+      createdAt: item.createdAt,
+      isRead: typeof item.isRead === 'boolean' ? item.isRead : Boolean(item.read),
+    } as Notification;
+  }
+
   // Get all notifications for the current user
   async getAllNotifications(): Promise<Notification[]> {
     try {
       const response = await apiClient.get(endPoints.notifications);
-      return response.data;
+      const data = Array.isArray(response.data) ? response.data : response.data?.notifications || [];
+      return (data as any[]).map((n) => this.normalizeNotification(n));
     } catch (error) {
       console.error('Error fetching notifications:', error);
       throw error;
@@ -30,7 +42,8 @@ class NotificationService {
   async getLatestNotifications(): Promise<Notification[]> {
     try {
       const response = await apiClient.get(endPoints.notificationsLatest);
-      return response.data;
+      const data = Array.isArray(response.data) ? response.data : response.data?.notifications || [];
+      return (data as any[]).map((n) => this.normalizeNotification(n));
     } catch (error) {
       console.error('Error fetching latest notifications:', error);
       throw error;
@@ -65,7 +78,7 @@ class NotificationService {
 
   // Sort notifications by priority (unread first, then by date)
   sortNotificationsByPriority(notifications: Notification[]): Notification[] {
-    return notifications.sort((a, b) => {
+    return [...notifications].sort((a, b) => {
       // First sort by read status (unread first)
       if (a.isRead !== b.isRead) {
         return a.isRead ? 1 : -1;
