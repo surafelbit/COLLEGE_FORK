@@ -1,7 +1,8 @@
 import { useRef, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { motion, useInView } from "framer-motion";
-
+import Plyr from "plyr-react";
+import "plyr-react/plyr.css";
 import Lottie from "lottie-react";
 import DarkVeil from "@/designs/DarkVeil";
 import LiquidChrome from "@/designs/LiquidChrome";
@@ -32,7 +33,13 @@ import CountUp from "react-countup";
 
 export default function LandingPage() {
   const [show, setShow] = useState(false);
+  const videoRefs = useRef(null);
+  const [isPlayingss, setIsPlayings] = useState(false);
 
+  const handlePlay = () => {
+    videoRefs.current.play();
+    setIsPlaying(true);
+  };
   useEffect(() => {
     const handleScroll = () => {
       setShow(window.scrollY > 300); // Show after scrolling 300px
@@ -124,7 +131,7 @@ export default function LandingPage() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="relative min-h-screen ">
+    <div className="relative min-h-screen dark:bg-gray-950">
       {/* DarkVeil Background */}
       {/* <div className="fixed inset-0 w-full h-full z-0 hidden dark:block fixed inset-0 overflow-x-hidden">
         <DarkVeil className="w-full h-full object-cover" />
@@ -380,7 +387,7 @@ export default function LandingPage() {
         </section>
 
         {/* Hero Section */}
-        <section id="home" className="my-8 container mx-auto px-4 py-10 pt-30">
+        <section id="home" className="my-8  container mx-auto px-4 py-10 pt-30">
           <div
             className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center gap-16 overflow-hidden"
             ref={heroRef}
@@ -388,13 +395,13 @@ export default function LandingPage() {
             {/* Image: Slide from left */}
             <motion.div
               className="w-full px-10 py-10 sm:w-2/5"
-              initial={{ opacity: 0, x: -300, scale: 0.8 }}
+              initial={{ opacity: 0, x: -75, scale: 0.8 }}
               animate={
                 heroInView
                   ? { opacity: 1, x: 0, scale: 1 }
-                  : { opacity: 0, x: -300, scale: 0.8 }
+                  : { opacity: 0, x: -75, scale: 0.8 }
               }
-              transition={{ duration: 1, ease: "easeOut" }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
             >
               <img
                 src="/assets/companylogo.jpg"
@@ -404,19 +411,19 @@ export default function LandingPage() {
             </motion.div>
 
             {/* Text: Slide from right */}
-            <motion.div
+            <div
               className="w-full sm:w-3/5 text-center sm:text-left max-w-4xl overflow-hidden"
-              initial={{ opacity: 0, x: 300 }}
+              initial={{ opacity: 0, x: 75 }}
               animate={
-                heroInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 300 }
+                heroInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 75 }
               }
-              transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
+              transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
             >
               <motion.h1
                 className="text-5xl font-bold text-gray-900 dark:text-white mb-6"
-                initial={{ opacity: 0, y: -100 }}
+                initial={{ opacity: 0, y: -50 }}
                 animate={
-                  heroInView ? { opacity: 1, y: 0 } : { opacity: 0, y: -100 }
+                  heroInView ? { opacity: 1, y: 0 } : { opacity: 0, y: -50 }
                 }
                 transition={{ duration: 1, delay: 0.6, ease: "easeOut" }}
               >
@@ -435,9 +442,9 @@ export default function LandingPage() {
 
               <motion.p
                 className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl"
-                initial={{ opacity: 0, y: 100 }}
+                initial={{ opacity: 0, y: 50 }}
                 animate={
-                  heroInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 100 }
+                  heroInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }
                 }
                 transition={{ duration: 1, delay: 0.9, ease: "easeOut" }}
               >
@@ -446,16 +453,7 @@ export default function LandingPage() {
                 undergraduate admission...
               </motion.p>
 
-              <motion.div
-                className="flex flex-col sm:flex-row gap-4 justify-center sm:justify-start"
-                initial={{ opacity: 0, y: 50, scale: 0.8 }}
-                animate={
-                  heroInView
-                    ? { opacity: 1, y: 0, scale: 1 }
-                    : { opacity: 0, y: 50, scale: 0.8 }
-                }
-                transition={{ duration: 1, delay: 1.2, ease: "easeOut" }}
-              >
+              <div className="flex flex-col sm:flex-row gap-4 justify-center sm:justify-start">
                 <Link to="/register">
                   <Button size="lg" className="text-lg px-8 py-3">
                     Register <ArrowRight className="ml-2 h-5 w-5" />
@@ -468,8 +466,8 @@ export default function LandingPage() {
                 >
                   Learn More
                 </Button>
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
           </div>
         </section>
         {/* <section className="container mx-auto px-6 py-24">
@@ -558,8 +556,8 @@ export default function LandingPage() {
             className="grid grid-cols-1 sm:grid-cols-2 gap-x-20 gap-y-10"
           >
             <motion.div
-              initial={{ opacity: 0, x: 100 }}
-              animate={infoView ? { opacity: 1, x: 0 } : { opacity: 0, x: 100 }}
+              initial={{ opacity: 0, x: 50 }}
+              animate={infoView ? { opacity: 1, x: 0 } : { opacity: 0, x: 50 }}
               transition={{ duration: 0.7, ease: "easeOut" }}
             >
               <div>
@@ -570,7 +568,6 @@ export default function LandingPage() {
                   For nearly five years, people have come to Douche in the
                   pursuit of truth, knowledge, and the betterment of society.
                 </p>
-                {/* ✅ Make the image responsive */}
                 <img
                   src="/assets/collegephoto.jpg"
                   alt="College"
@@ -580,17 +577,15 @@ export default function LandingPage() {
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, x: -100 }}
-              animate={
-                infoView ? { opacity: 1, x: 0 } : { opacity: 0, x: -100 }
-              }
+              initial={{ opacity: 0, x: -50 }}
+              animate={infoView ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }}
               transition={{ duration: 0.7, ease: "easeOut" }}
               className="flex flex-col justify-between"
             >
               <motion.div
-                initial={{ opacity: 0, y: -100 }}
+                initial={{ opacity: 0, y: -50 }}
                 animate={
-                  infoView ? { opacity: 1, y: 0 } : { opacity: 0, y: -100 }
+                  infoView ? { opacity: 1, y: 0 } : { opacity: 0, y: -50 }
                 }
                 transition={{ duration: 0.7, ease: "easeOut" }}
                 className="gap-y-8"
@@ -603,7 +598,7 @@ export default function LandingPage() {
                 </p>
               </motion.div>
 
-              <div>
+              {/* <div>
                 <h2 className="text-2xl text-blue-500 dark:text-blue-300 font-serif">
                   204{" "}
                 </h2>
@@ -611,7 +606,7 @@ export default function LandingPage() {
                   Undergraduate and graduate students in the 2023-24 academic
                   year
                 </p>
-              </div>
+              </div> */}
 
               <motion.div
                 initial={{ opacity: 0, y: 100 }}
@@ -621,10 +616,10 @@ export default function LandingPage() {
                 transition={{ duration: 0.7, ease: "easeOut" }}
               >
                 <h2 className="text-2xl text-blue-500 dark:text-blue-300 font-serif">
-                  433{" "}
+                  Hundreds{" "}
                 </h2>
                 <p className="text-lg dark:text-white text-black font-mono">
-                  students currently engaged now
+                  of students currently engaged now
                 </p>
               </motion.div>
             </motion.div>
@@ -777,7 +772,7 @@ export default function LandingPage() {
 
         <section
           id="hero"
-          className="relative mx-20 my-8 h-screen overflow-hidden text-white font-sans"
+          className="relative  my-8 h-100 overflow-hidden text-white font-sans"
         >
           {/* Background video */}
           <video
@@ -835,35 +830,6 @@ export default function LandingPage() {
               </span>
             </motion.p>
 
-            {/* Badges with float */}
-            <motion.div
-              className="flex flex-wrap justify-center gap-5 mb-8"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1.5, delay: 1.6, ease: "easeOut" }}
-            >
-              {["Regular", "Distance", "Extension"].map((type, idx) => (
-                <motion.span
-                  key={idx}
-                  className="px-5 py-3 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 text-white font-semibold shadow-lg cursor-pointer"
-                  whileHover={{
-                    scale: 1.1,
-                    y: -5,
-                    boxShadow: "0 10px 25px rgba(0,0,0,0.5)",
-                  }}
-                  animate={{ y: [0, -5, 0] }}
-                  transition={{
-                    duration: 2 + idx,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: idx * 0.3,
-                  }}
-                >
-                  {type}
-                </motion.span>
-              ))}
-            </motion.div>
-
             {/* CTA button */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -885,14 +851,18 @@ export default function LandingPage() {
         {/* Core Values, Vision, Mission */}
         <section
           id="mission"
-          className="container my-8 mx-auto px-4 py-16"
+          className="container my-8 mx-auto px-4 py-20"
           ref={missionRef}
         >
-          <h2 className="text-2xl ml-12 font-bold mb-4 text-blue-500 dark:text-white">
-            Values and Missions
+          <h2
+            className="text-4xl font-extrabold text-center mb-16 
+    bg-gradient-to-r from-blue-600 to-cyan-400 bg-clip-text text-transparent 
+    drop-shadow-lg tracking-tight"
+          >
+            Values And Mission{" "}
           </h2>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto overflow-hidden">
+          <div className="grid md:grid-cols-3  gap-8 max-w-6xl mx-auto overflow-hidden">
             {/* Card 1 - slide from up */}
             <motion.div
               initial={{ opacity: 0, y: -50 }}
@@ -901,7 +871,7 @@ export default function LandingPage() {
               }
               transition={{ duration: 0.8, ease: "easeOut" }}
             >
-              <Card className="text-center bg-white dark:bg-black shadow-[0_0_15px_rgba(255,255,255,0.3)] transform transition-transform duration-300 hover:scale-105 hover:shadow-[0_0_15px_rgba(255,255,255,0.6)]">
+              <Card className="text-center my-6 bg-white dark:bg-gray-900 shadow-[0_0_15px_rgba(255,255,255,0.3)] transform transition-transform duration-300 hover:scale-105 hover:shadow-[0_0_15px_rgba(255,255,255,0.6)]">
                 <CardHeader>
                   <img
                     src="/assets/student.jpg"
@@ -928,7 +898,7 @@ export default function LandingPage() {
               }
               transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
             >
-              <Card className="text-center bg-white dark:bg-black shadow-[0_0_15px_rgba(255,255,255,0.3)] transform transition-transform duration-300 hover:scale-105 hover:shadow-[0_0_15px_rgba(255,255,255,0.6)]">
+              <Card className="text-center bg-white my-6 dark:bg-gray-900 shadow-[0_0_15px_rgba(255,255,255,0.3)] transform transition-transform duration-300 hover:scale-105 hover:shadow-[0_0_15px_rgba(255,255,255,0.6)]">
                 <CardHeader>
                   <img
                     src="/assets/laboratory.jpg"
@@ -955,7 +925,7 @@ export default function LandingPage() {
               }
               transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}
             >
-              <Card className="text-center bg-white dark:bg-black shadow-[0_0_15px_rgba(255,255,255,0.3)] transform transition-transform duration-300 hover:scale-105 hover:shadow-[0_0_15px_rgba(255,255,255,0.6)]">
+              <Card className="text-center bg-white my-6 dark:bg-gray-900 shadow-[0_0_15px_rgba(255,255,255,0.3)] transform transition-transform duration-300 hover:scale-105 hover:shadow-[0_0_15px_rgba(255,255,255,0.6)]">
                 <CardHeader>
                   <img
                     src="/assets/intro.jpg"
@@ -977,7 +947,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <div className="pt-28 pb-48">
+        {/* <div className="pt-28 pb-48">
           <div className="container mx-auto px-4">
             <h2 className="text-2xl font-bold mb-4 text-blue-500 dark:text-white">
               DISCOVER MORE
@@ -988,7 +958,6 @@ export default function LandingPage() {
                 id="carousel"
                 className="flex space-x-4 overflow-x-auto scroll-smooth"
               >
-                {/* Card 1 */}
                 <div className="min-w-[250px] flex-shrink-0 bg-white p-4 rounded-lg shadow-md">
                   <img
                     src="/assets/collegephoto.jpg"
@@ -1002,16 +971,15 @@ export default function LandingPage() {
                     Right here in Bahirdar
                   </p>
                 </div>
-                {/* Card 2 */}
                 <div className="min-w-[250px] flex-shrink-0 bg-white p-4 rounded-lg shadow-md">
                   <video
                     controls
-                    poster="https://res.cloudinary.com/djz4nl0ic/video/upload/v1755066400/4C5A5182_pqbmq6.jpg"
+                    poster="https://res.cloudinary.com/djz4nl0ic/video/upload/v1759434928/lv_0_20251002223127_jwkzc8.jpg"
                     preload="none"
                     className="w-full h-40 object-cover mb-2"
                   >
                     <source
-                      src="https://res.cloudinary.com/djz4nl0ic/video/upload/v1755066400/4C5A5182_pqbmq6.mov"
+                      src="https://res.cloudinary.com/djz4nl0ic/video/upload/v1759434928/lv_0_20251002223127_jwkzc8.mp4"
                       type="video/mp4"
                     />
                     Your browser does not support the video tag.
@@ -1023,7 +991,6 @@ export default function LandingPage() {
                     Team Meatings encouraged To Facilitate Learning Process
                   </p>
                 </div>
-                {/* Card 3 */}
                 <div className="min-w-[250px] flex-shrink-0 bg-white p-4 rounded-lg shadow-md">
                   <video
                     controls
@@ -1079,7 +1046,6 @@ export default function LandingPage() {
                   </video>
                 </div>
               </div>
-              {/* Navigation Arrows */}
               <button
                 id="prev"
                 onClick={scrollPrev}
@@ -1096,11 +1062,95 @@ export default function LandingPage() {
               </button>
             </div>
           </div>
-        </div>
-        {window.innerWidth > 720 && (
+        </div> */}
+        {/* <video
+          ref={videoRef}
+          poster="https://res.cloudinary.com/djz4nl0ic/video/upload/v1759434928/lv_0_20251002223127_jwkzc8.jpg"
+          preload="none"
+          className="w-00 h-58 object-cover rounded-xl shadow-lg"
+          controls={isPlaying} // only show controls after play
+        >
+          <source
+            src="https://res.cloudinary.com/djz4nl0ic/video/upload/v1759434928/lv_0_20251002223127_jwkzc8.mp4"
+            type="video/mp4"
+          />
+        </video> */}
+        <section style={{ textAlign: "left", marginBottom: "60px" }}>
+          <h2
+            className="text-4xl font-extrabold text-center mb-16 
+    bg-gradient-to-r from-blue-600 to-cyan-400 bg-clip-text text-transparent 
+    drop-shadow-lg tracking-tight"
+          >
+            Discover More
+          </h2>
+
+          <div
+            style={{
+              position: "relative",
+              width: "90%",
+              paddingBottom: "90px",
+              margin: "0 auto 40px auto", // adds 40px bottom space only
+              paddingTop: `${(1 / 4) * 100}%`, // 4:1 aspect ratio
+              overflow: "hidden",
+            }}
+          >
+            <video
+              ref={videoRefs}
+              src="https://res.cloudinary.com/djz4nl0ic/video/upload/v1759434928/lv_0_20251002223127_jwkzc8.mp4"
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "90%",
+                objectFit: "cover",
+              }}
+              controls={isPlaying} // show controls only when playing
+            />
+
+            {!isPlaying && (
+              <button
+                onClick={handlePlay}
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  background: "#FF0000", // YouTube red
+                  border: "none",
+                  borderRadius: "50%",
+                  width: "80px",
+                  height: "80px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+                }}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="white"
+                  width="40px"
+                  height="40px"
+                  style={{ marginLeft: "4px" }} // shift to center visually
+                >
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              </button>
+            )}
+          </div>
+        </section>
+
+        {window.innerWidth > 820 && (
           <div className="relative h-[600px] px-10 ">
             {/* Heading positioned at the top center */}
-            <h2 className="text-4xl font-bold text-blue-500 dark:text-white mb-2">
+            <h2
+              className="text-4xl font-extrabold text-center mb-16 
+    bg-gradient-to-r from-blue-600 to-cyan-400 bg-clip-text text-transparent 
+    drop-shadow-lg tracking-tight"
+            >
               Our Facilities
             </h2>
 
@@ -1206,7 +1256,7 @@ export default function LandingPage() {
                     </li>
                     <li>
                       <a
-                        href="#"
+                        href="#programs"
                         className="text-blue-600 hover:text-gray-400 dark:text-white dark:hover:text-gray-400"
                       >
                         Programs
@@ -1226,20 +1276,20 @@ export default function LandingPage() {
                   <h4 className="font-semibold mb-4">{t("contact")}</h4>
                   <ul className="space-y-2 ">
                     <li className="text-blue-600 hover:text-gray-400 dark:text-white dark:hover:text-gray-400">
-                      Dipo Bahirdar
+                      Bahirdar Noc
                     </li>
                     <li className="text-blue-600 hover:text-gray-400 dark:text-white dark:hover:text-gray-400">
                       Bahirdar, Ethiopia 10115
                     </li>
                     <li className="text-blue-600 hover:text-gray-400 dark:text-white dark:hover:text-gray-400">
-                      +251
+                      058 22 08 158
                     </li>
                     <li className="text-blue-600 hover:text-gray-400 dark:text-white dark:hover:text-gray-400">
                       dochebahirdar@gmail.com
                     </li>
                   </ul>
                 </div>
-                <div>
+                {/* <div>
                   <h4 className="font-semibold mb-4">Follow Us</h4>
                   <div className="flex flex-col space-x-4">
                     <Button
@@ -1264,7 +1314,7 @@ export default function LandingPage() {
                       <span className="sr-only">LinkedIn</span>💼
                     </Button>
                   </div>
-                </div>
+                </div> */}
               </div>
               <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
                 <p>Deutsche Hochschule für Medizin College Bahirdar Website.</p>
