@@ -134,6 +134,7 @@
 //   )
 // }
 "use client"
+import { useNavigate } from "react-router-dom";
 
 import { Outlet, Link, useLocation } from "react-router-dom"
 import { Button } from "@/components/ui/button"
@@ -143,6 +144,8 @@ import { LayoutDashboard, Users, BookOpen, BarChart3, LogOut, Menu } from "lucid
 import { useEffect, useState } from "react"
 
 export default function HeadLayout() {
+  const navigate = useNavigate();
+
   const location = useLocation()
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [listOpen, setListOpen] = useState(false)

@@ -113,7 +113,7 @@ export default function DeanDashboard() {
       <div className="p-6 space-y-6 max-w-7xl mx-auto">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold text-blue-600 dark:text-blue-400">
-            Dean Dashboard
+            Vice Dean Dashboard
           </h1>
           <Link to="/dean/create-department-head">
             <Button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700">
