@@ -20,9 +20,8 @@ import { Table } from "antd";
 import type { TableColumnsType } from "antd";
 import SalesTable from "@/components/Extra/SalesTable";
 // import EditableTable, { DataTypes } from "@/components/Extra/EditableTable";
-import EditableTableManager, {
-  DataTypes,
-} from "@/components/Extra/EditableTableManager";
+import EditableTableManager from "@/components/Extra/EditableTableManager";
+import type { DataTypes } from "@/components/Extra/EditableTableManager"; // 👈 note `type`
 
 const initialData: DataTypes[] = [
   {

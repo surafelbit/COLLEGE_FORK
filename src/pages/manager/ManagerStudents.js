@@ -14,7 +14,7 @@ import { ReusableTable } from "../../components/Extra/ReusableTable";
 import { Table } from "antd";
 import SalesTable from "@/components/Extra/SalesTable";
 // import EditableTable, { DataTypes } from "@/components/Extra/EditableTable";
-import EditableTableManager, { DataTypes, } from "@/components/Extra/EditableTableManager";
+import EditableTableManager from "@/components/Extra/EditableTableManager";
 const initialData = [
     {
         key: "1",
